@@ -20,7 +20,7 @@
         <div class="relative z-10 px-6 sm:px-10 lg:px-16 py-14 lg:py-20 flex flex-col justify-center grain-overlay">
             <div class="flex items-center gap-3 mb-5">
                 <span class="inline-block h-[3px] w-10 bg-flag-500"></span>
-                <span class="meta-stamp">Serikat Pekerja Tani Karawang · Est. 2007 · Kongres III</span>
+                <span class="meta-stamp">Serikat Pekerja Tani Karawang · Est. 3 Nov 2007 · Kongres I</span>
             </div>
 
             <h1 class="font-display leading-[0.86] uppercase tracking-[0.01em] text-ink-900">

@@ -25,8 +25,26 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('SEPETAK Admin')
+            ->brandLogoHeight('2.25rem')
+            ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::hex('#991b1b'),
+                'danger' => Color::Red,
+                'gray' => Color::Slate,
+                'info' => Color::Blue,
+                'success' => Color::Emerald,
+                'warning' => Color::Amber,
+            ])
+            ->sidebarCollapsibleOnDesktop()
+            ->navigationGroups([
+                'Konten',
+                'Artikel Otomatis',
+                'Anggota',
+                'Advokasi',
+                'Agenda',
+                'Galeri',
+                'Pengaturan',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

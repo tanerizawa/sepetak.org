@@ -22,23 +22,17 @@ class DatabaseSeeder extends Seeder
         $this->seedWelcomePost();
 
         // Deferred — each seeder guards against duplicate page slugs.
-        $this->callOnce([
-            AdArtPageContent::class,
+        $this->runOptional([
             PublicProfilePagesSeeder::class,
-            SejarahPageContent::class,
-            StrukturOrganisasiPageContent::class,
-            TentangKamiPageContent::class,
             TentangKamiContentUpdateSeeder::class,
-            VisiMisiPageContent::class,
-            WilayahKerjaPageContent::class,
-            KontakPageContent::class,
             AdvocacyProgramsOrganizationSeeder::class,
             AdvocacyOrganizationCasesSeeder::class,
             DailyMemberTipsArticleSeeder::class,
+            ArticleTopicSeeder::class,
         ]);
     }
 
-    protected function callOnce(array $seeders): void
+    protected function runOptional(array $seeders): void
     {
         foreach ($seeders as $seeder) {
             if (class_exists($seeder)) {
@@ -117,34 +111,31 @@ class DatabaseSeeder extends Seeder
     protected function seedCategories(): void
     {
         $defaults = [
-            ['slug' => 'umum', 'name' => 'Umum', 'color' => '#6b7280'],
-            ['slug' => 'agraria', 'name' => 'Agraria', 'color' => '#15803d'],
-            ['slug' => 'advokasi', 'name' => 'Advokasi', 'color' => '#b45309'],
-            ['slug' => 'organisasi', 'name' => 'Organisasi', 'color' => '#1d4ed8'],
-            ['slug' => 'panduan-tips-anggota', 'name' => 'Panduan & Tips Anggota', 'color' => '#7c3aed'],
+            ['slug' => 'umum', 'name' => 'Umum'],
+            ['slug' => 'agraria', 'name' => 'Agraria'],
+            ['slug' => 'advokasi', 'name' => 'Advokasi'],
+            ['slug' => 'organisasi', 'name' => 'Organisasi'],
+            ['slug' => 'panduan-tips-anggota', 'name' => 'Panduan & Tips Anggota'],
         ];
 
         foreach ($defaults as $c) {
-            Category::updateOrCreate(['slug' => $c['slug']], [
-                'name' => $c['name'],
-                'color' => $c['color'],
-            ]);
+            Category::updateOrCreate(['slug' => $c['slug']], ['name' => $c['name']]);
         }
     }
 
     protected function seedSiteSettings(): void
     {
         $pairs = [
-            ['setting_key' => 'site_name', 'setting_value' => 'SEPETAK — Serikat Pekerja Tani Karawang', 'setting_group' => 'identity'],
-            ['setting_key' => 'site_description', 'setting_value' => 'Organisasi pekerja tani Karawang yang membela hak agraria dan memperkuat solidaritas petani sejak 2007.', 'setting_group' => 'identity'],
-            ['setting_key' => 'tagline', 'setting_value' => 'Tani Motekar — Solidaritas Tanpa Batas', 'setting_group' => 'identity'],
-            ['setting_key' => 'contact_email', 'setting_value' => 'kontak@sepetak.org', 'setting_group' => 'contact'],
+            ['setting_key' => 'site_name', 'setting_value' => 'SEPETAK — Serikat Pekerja Tani Karawang', 'group_name' => 'identity'],
+            ['setting_key' => 'site_description', 'setting_value' => 'Organisasi pekerja tani Karawang yang membela hak agraria dan memperkuat solidaritas petani sejak 2007.', 'group_name' => 'identity'],
+            ['setting_key' => 'tagline', 'setting_value' => 'Tani Motekar — Solidaritas Tanpa Batas', 'group_name' => 'identity'],
+            ['setting_key' => 'contact_email', 'setting_value' => 'kontak@sepetak.org', 'group_name' => 'contact'],
         ];
 
         foreach ($pairs as $p) {
             SiteSetting::updateOrCreate(
                 ['setting_key' => $p['setting_key']],
-                ['setting_value' => $p['setting_value'], 'setting_group' => $p['setting_group']]
+                ['setting_value' => $p['setting_value'], 'group_name' => $p['group_name']]
             );
         }
     }
