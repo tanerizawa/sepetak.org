@@ -126,10 +126,11 @@ class DatabaseSeeder extends Seeder
     protected function seedSiteSettings(): void
     {
         $pairs = [
-            ['setting_key' => 'site_name', 'setting_value' => 'SEPETAK — Serikat Pekerja Tani Karawang', 'group_name' => 'identity'],
-            ['setting_key' => 'site_description', 'setting_value' => 'Organisasi pekerja tani Karawang yang membela hak agraria dan memperkuat solidaritas petani sejak 2007.', 'group_name' => 'identity'],
-            ['setting_key' => 'tagline', 'setting_value' => 'Tani Motekar — Solidaritas Tanpa Batas', 'group_name' => 'identity'],
-            ['setting_key' => 'contact_email', 'setting_value' => 'kontak@sepetak.org', 'group_name' => 'contact'],
+            ['setting_key' => 'site_name', 'setting_value' => 'SEPETAK (Serikat Pekerja Tani Karawang)', 'group_name' => 'umum'],
+            ['setting_key' => 'site_tagline', 'setting_value' => 'Rebut Kedaulatan Agraria, Bangun Industrialisasi Pertanian', 'group_name' => 'umum'],
+            ['setting_key' => 'site_description', 'setting_value' => 'Serikat Pekerja Tani Karawang (SEPETAK): organisasi massa pekerja tani dan nelayan di Kabupaten Karawang. Tonggak Kongres I (2007), program TANI MOTEKAR (Kongres II, 2010), nama resmi Kongres IV (2020). Reforma agraria dan solidaritas kolektif.', 'group_name' => 'umum'],
+            ['setting_key' => 'hero_intro', 'setting_value' => 'SEPETAK memperjuangkan reforma agraria sejati, meliputi akses tanah, air, dan benih bagi pekerja tani serta nelayan di wilayah pedesaan dan pesisir Kabupaten Karawang.', 'group_name' => 'umum'],
+            ['setting_key' => 'contact_email', 'setting_value' => 'kontak@sepetak.org', 'group_name' => 'kontak'],
         ];
 
         foreach ($pairs as $p) {
@@ -151,8 +152,8 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'selamat-datang-di-sepetak'],
             [
                 'title' => 'Selamat Datang di SEPETAK',
-                'excerpt' => 'Website resmi Serikat Pekerja Tani Karawang (SEPETAK) — ruang solidaritas, advokasi, dan informasi agraria.',
-                'body' => '<p>Selamat datang di sepetak.org. Kami adalah serikat pekerja tani yang berdiri sejak 2007 dan meresmikan nama <strong>Serikat Pekerja Tani Karawang</strong> pada Kongres IV (31 Oktober – 1 November 2020).</p>',
+                'excerpt' => 'Website resmi Serikat Pekerja Tani Karawang (SEPETAK): ruang solidaritas, advokasi, dan informasi agraria.',
+                'body' => '<p>Selamat datang di sepetak.org. Kami adalah serikat pekerja tani yang berdiri sejak 2007 dan meresmikan nama <strong>Serikat Pekerja Tani Karawang</strong> pada Kongres IV (31 Oktober–1 November 2020).</p>',
                 'status' => 'published',
                 'published_at' => now(),
                 'author_id' => $admin->getKey(),

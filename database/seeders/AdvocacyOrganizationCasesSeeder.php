@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Mengisi kasus/advokasi organisasi dari kurasi docs/ADVOCACY_TIMELINE_SEPETAK.md.
- * Idempotent: updateOrCreate berdasarkan case_code ORG-ADV-001 … ORG-ADV-028.
+ * Idempotent: updateOrCreate berdasarkan case_code ORG-ADV-001 … ORG-ADV-038.
  */
 class AdvocacyOrganizationCasesSeeder extends Seeder
 {
@@ -45,7 +45,7 @@ class AdvocacyOrganizationCasesSeeder extends Seeder
      */
     private function rows(): array
     {
-        $foot = "\n\n— Data diimpor dari kurasi repositori (docs/ADVOCACY_TIMELINE_SEPETAK.md, April 2026). Sesuaikan di admin setelah verifikasi sekretariat.";
+        $foot = "\n\nData diimpor dari kurasi repositori internal (April 2026). Entri ini bersifat informatif; lengkapi dan verifikasi melalui panel admin setelah persetujuan sekretariat.";
 
         return [
             [
@@ -327,6 +327,106 @@ class AdvocacyOrganizationCasesSeeder extends Seeder
                 'start_date' => '2013-01-28',
                 'status' => 'closed',
                 'priority' => 'low',
+            ],
+            [
+                'case_code' => 'ORG-ADV-029',
+                'title' => 'Eksekusi putusan PN Karawang — sengketa lahan Teluk Jambe (Juni 2014)',
+                'summary' => 'Pelaksanaan eksekusi di lahan sengketa skala besar; narasi pers menyebut aparat skala besar dan eskalasi fisik terhadap massa tani.',
+                'description' => 'Tipe: eskalasi_penegakan_hukum. Terkait rangkaian sengketa lahan tiga desa di Kecamatan Telukjambe Barat terhadap klaim korporasi (lihat ORG-ADV-011). Catatan publik menyebut diskrepansi antara luas yang dieksekusi dengan luas dalam putusan; rincian forensik lapangan wajib diverifikasi sekretariat.'.$foot,
+                'location_text' => 'Margamulya, Wanasari, Wanakerta, Kec. Telukjambe Barat',
+                'start_date' => '2014-06-01',
+                'status' => 'closed',
+                'priority' => 'urgent',
+            ],
+            [
+                'case_code' => 'ORG-ADV-030',
+                'title' => 'Konflik Perhutani di Medalsari dan kriminalisasi pengurus (Oktober 2015)',
+                'summary' => 'Aksi pengaduan ke Pemda terkait intimidasi; dua pengurus SEPETAK dilaporkan mengalami proses hukum terkait dinamika konflik hutan.',
+                'description' => 'Tipe: konflik_kawasan_hutan. Narasi koalisi menyebut isu pemalsuan administratif dan intervensi IP4T; keterkaitan dengan LSM pihak ketiga perlu verifikasi dokumen resmi.'.$foot,
+                'location_text' => 'Medalsari & Pemda Karawang',
+                'start_date' => '2015-10-01',
+                'status' => 'closed',
+                'priority' => 'high',
+            ],
+            [
+                'case_code' => 'ORG-ADV-031',
+                'title' => 'Pengaduan ke KPK, Mabes Polri, dan Komnas HAM — sengketa Agung Podomoro Land (April 2016)',
+                'summary' => 'Mobilisasi petani dari tiga desa terdampak untuk menyampaikan dugaan korupsi, perampasan lahan, dan pelanggaran HAM.',
+                'description' => 'Tipe: advokasi_institusi_nasional. Terkait ORG-ADV-011. Bukan putusan; berupa upaya penyampaian aspirasi dan bukti administratif kepada lembaga pengawas.'.$foot,
+                'location_text' => 'Jakarta',
+                'start_date' => '2016-04-01',
+                'status' => 'closed',
+                'priority' => 'high',
+            ],
+            [
+                'case_code' => 'ORG-ADV-032',
+                'title' => 'Kriminalisasi petani — perkara kayu hutan Desa Parung Mulya (2017)',
+                'summary' => 'Petani lanjut usia didakwa terkait kayu kawasan hutan; organisasi menilai preseden buruk di tengah narasi reforma agraria pemerintah.',
+                'description' => 'Tipe: kriminalisasi_anggota. Lokasi administratif: Kecamatan Ciampel. Dokumentasikan nomor perkara dan kuasa hukum di admin bila tersedia.'.$foot,
+                'location_text' => 'Desa Parung Mulya, Kec. Ciampel',
+                'start_date' => '2017-01-01',
+                'status' => 'legal_process',
+                'priority' => 'medium',
+            ],
+            [
+                'case_code' => 'ORG-ADV-033',
+                'title' => 'Konflik kebijakan air irigasi — surat PJT II terhadap petani Pakisjaya (2021)',
+                'summary' => 'Protes organisasi terhadap pembatasan tanam padi akibat kondisi tampungan waduk; ancana aksi massa bila kebijakan tidak direvisi.',
+                'description' => 'Tipe: advokasi_infrastruktur_irigasi. Terkait tata kelola air Jatiluhur dan koordinasi pemangku kebijakan daerah (Bappeda, komisi irigasi).'.$foot,
+                'location_text' => 'Kec. Pakisjaya, Kab. Karawang',
+                'start_date' => '2021-01-01',
+                'status' => 'mediation',
+                'priority' => 'high',
+            ],
+            [
+                'case_code' => 'ORG-ADV-034',
+                'title' => 'Insiden administrasi tanah di Kantor BPN Karawang (Oktober 2022)',
+                'summary' => 'Ketegangan saat pengajuan administrasi tanah bertemu klaim kawasan hutan; narasi pendamping menyebut risiko persekusi terhadap advokat.',
+                'description' => 'Tipe: administrasi_tanah. Terkait ORG-ADV-021. Pendampingan bersama LBH Cakra; dokumentasikan nomor surat dan hasil audiensi resmi bila ada.'.$foot,
+                'location_text' => 'Kantor BPN Kab. Karawang',
+                'start_date' => '2022-10-15',
+                'status' => 'under_review',
+                'priority' => 'high',
+            ],
+            [
+                'case_code' => 'ORG-ADV-035',
+                'title' => 'Aksi massa di Pemda Karawang — delapan tuntutan reforma agraria (Oktober 2022)',
+                'summary' => 'Mobilisasi bersama elemen gerakan lain; memuat tuntutan sertifikasi, audit perampasan tanah, dan tata kelola BPN.',
+                'description' => 'Tipe: aksi_massa_kabupaten. Melengkapi dokumentasi ORG-ADV-020 pada rentang waktu yang sama; satukan arsip pers dan notulen audiensi di admin.'.$foot,
+                'location_text' => 'Kantor Pemda Kab. Karawang',
+                'start_date' => '2022-10-20',
+                'status' => 'reported',
+                'priority' => 'medium',
+            ],
+            [
+                'case_code' => 'ORG-ADV-036',
+                'title' => 'Dugaan pemalsuan administrasi desa — PHBM Batujaya (November 2022)',
+                'summary' => 'Pelaporan polisi terkait cap dan tanda tangan desa pada naskah Pengelolaan Hutan Bersama Masyarakat.',
+                'description' => 'Tipe: administrasi_hutan. Desa Karyabakti, Kecamatan Batujaya; lampirkan berkas perkara setelah verifikasi internal.'.$foot,
+                'location_text' => 'Desa Karyabakti, Kec. Batujaya',
+                'start_date' => '2022-11-01',
+                'status' => 'legal_process',
+                'priority' => 'medium',
+            ],
+            [
+                'case_code' => 'ORG-ADV-037',
+                'title' => 'Rakor Kementerian ATR/BPN — penanganan pertanahan Karawang (Oktober 2025)',
+                'summary' => 'Partisipasi perwakilan organisasi dalam koordinasi kebijakan tata ruang dan reforma agraria tingkat kabupaten.',
+                'description' => 'Tipe: advokasi_kebijakan. Termasuk narasi dukungan terhadap One Map Policy dan pembentukan badan pelaksana reforma agraria; sesuaikan dengan notulen resmi rapat.'.$foot,
+                'location_text' => 'Kab. Karawang',
+                'start_date' => '2025-10-01',
+                'status' => 'mediation',
+                'priority' => 'medium',
+            ],
+            [
+                'case_code' => 'ORG-ADV-038',
+                'title' => 'Peringatan Hari Nelayan 2026 — koalisi pesisir di Sedari (April 2026)',
+                'summary' => 'Aksi bersama Koalisi Rakyat untuk Keadilan Perikanan (IARA) menegaskan ruang hidup nelayan dan penolakan revitalisasi tambak merugikan.',
+                'description' => 'Tipe: aksi_pesisir. Sekitar 650 peserta menurut liputan publik (campuran nelayan, petambak, mahasiswa, dan ormas); bukan hitungan anggota murni.'.$foot,
+                'location_text' => 'Desa Sedari, Kec. Cibuaya',
+                'start_date' => '2026-04-01',
+                'status' => 'reported',
+                'priority' => 'medium',
             ],
         ];
     }

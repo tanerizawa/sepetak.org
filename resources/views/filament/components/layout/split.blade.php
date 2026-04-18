@@ -10,11 +10,12 @@
 
         {{-- Poster kiri — identitas organisasi --}}
         <aside class="sepetak-login-poster">
+            @php($logoV = config('sepetak.logo_asset_version', '3'))
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 border-2 border-paper-50 bg-paper-50 overflow-hidden">
                     <img
-                        src="{{ asset('img/logo/logo-96.png') }}?v=2"
-                        srcset="{{ asset('img/logo/logo-96.png') }}?v=2 1x, {{ asset('img/logo/logo-128.png') }}?v=2 2x"
+                        src="{{ asset('img/logo/logo-96.png') }}?v={{ $logoV }}"
+                        srcset="{{ asset('img/logo/logo-96.png') }}?v={{ $logoV }} 1x, {{ asset('img/logo/logo-128.png') }}?v={{ $logoV }} 2x"
                         alt=""
                         width="48" height="48"
                         class="block w-full h-full object-cover"

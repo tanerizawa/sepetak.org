@@ -18,11 +18,19 @@
     <meta property="og:title" content="@yield('og_title', $__env->yieldContent('title', \App\Models\SiteSetting::getValue('site_name', 'SEPETAK')))">
     <meta property="og:description" content="@yield('og_description', $__env->yieldContent('meta_description', \App\Models\SiteSetting::getValue('site_description', 'SEPETAK - Serikat Pekerja Tani Karawang')))">
     <meta property="og:locale" content="id_ID">
+    @php($logoV = config('sepetak.logo_asset_version', '3'))
+    <meta property="og:image" content="{{ asset('img/logo/logo-512.png') }}?v={{ $logoV }}">
+    <meta property="og:image:alt" content="Logo SEPETAK — Serikat Pekerja Tani Karawang">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/logo/logo-32.png') }}?v={{ $logoV }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/logo/logo-16.png') }}?v={{ $logoV }}">
+    <link rel="apple-touch-icon" href="{{ asset('img/logo/logo-180.png') }}?v={{ $logoV }}">
 
     {{-- Twitter Card --}}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('og_title', $__env->yieldContent('title', \App\Models\SiteSetting::getValue('site_name', 'SEPETAK')))">
     <meta name="twitter:description" content="@yield('og_description', $__env->yieldContent('meta_description', \App\Models\SiteSetting::getValue('site_description', 'SEPETAK - Serikat Pekerja Tani Karawang')))">
+    <meta name="twitter:image" content="{{ asset('img/logo/logo-512.png') }}?v={{ $logoV }}">
 
     {{-- Fonts — palet "Tani Merah": Anton (display), Work Sans (body), Space Mono (label), Roboto Slab (blockquote) --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +61,7 @@
             <span class="font-mono tracking-widest uppercase hidden sm:inline">SOLIDARITAS · ORGANISASI · PEMBEBASAN</span>
             <span class="font-mono tracking-widest uppercase sm:hidden">TANI MERAH</span>
             <div class="flex items-center gap-4 font-mono tracking-wider uppercase">
-                <a href="{{ route('pages.show', 'kontak') }}" class="hover:underline">Kontak</a>
+                <a href="{{ route('contact.show') }}" class="hover:underline">Kontak</a>
                 <span class="opacity-50">|</span>
                 <a href="{{ url('/feed.xml') }}" class="hover:underline">RSS</a>
             </div>
@@ -68,8 +76,8 @@
             <div class="flex justify-between items-center h-16">
                 {{-- Logo --}}
                 <a href="{{ route('beranda') }}" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 bg-flag-500 border-2 border-ink-900 flex items-center justify-center group-hover:bg-ink-900 group-hover:text-flag-500 transition-colors">
-                        <span class="font-display text-paper-50 text-xl leading-none group-hover:text-flag-500">S</span>
+                    <div class="w-10 h-10 border-2 border-ink-900 overflow-hidden bg-flag-500 flex-shrink-0 shadow-[2px_2px_0_#0D0D0D] group-hover:opacity-95 transition-opacity">
+                        @include('partials.logo-mark')
                     </div>
                     <div class="leading-none">
                         <div class="font-display text-xl text-ink-900 tracking-wider">SEPETAK</div>
@@ -80,7 +88,7 @@
                 {{-- Desktop Nav --}}
                 <div class="hidden md:flex items-center gap-7">
                     <a href="{{ route('beranda') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Beranda</a>
-                    <a href="{{ route('posts.index') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Berita</a>
+                    <a href="{{ route('posts.index') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Artikel</a>
                     <a href="{{ route('pages.show', 'tentang-kami') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Tentang</a>
                     <a href="{{ route('pages.show', 'sejarah') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Sejarah</a>
                     <a href="{{ route('pages.show', 'struktur-organisasi') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Struktur</a>
@@ -101,12 +109,12 @@
             {{-- Mobile Nav --}}
             <div id="mobile-menu" class="hidden md:hidden pb-4 border-t-2 border-ink-900/20 pt-2 space-y-1">
                 <a href="{{ route('beranda') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Beranda</a>
-                <a href="{{ route('posts.index') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Berita</a>
+                <a href="{{ route('posts.index') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Artikel</a>
                 <a href="{{ route('pages.show', 'tentang-kami') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Tentang Kami</a>
                 <a href="{{ route('pages.show', 'sejarah') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Sejarah</a>
                 <a href="{{ route('pages.show', 'struktur-organisasi') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Struktur</a>
                 <a href="{{ route('pages.show', 'wilayah-kerja') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Wilayah Kerja</a>
-                <a href="{{ route('pages.show', 'kontak') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Kontak</a>
+                <a href="{{ route('contact.show') }}" class="block py-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:bg-flag-500 hover:text-paper-50 px-2">Kontak</a>
                 <a href="{{ route('member-registration.create') }}" class="mt-3 block btn-rev btn-rev-red w-full justify-center">
                     Daftar Anggota
                 </a>
@@ -150,18 +158,18 @@
             {{-- Strip slogan raksasa --}}
             <div class="mb-12 pb-8 border-b-2 border-paper-50/20">
                 <div class="font-display text-4xl sm:text-6xl leading-[0.9] text-paper-50 tracking-wide">
-                    TANAH UNTUK <span class="text-flag-500">PENGGARAPNYA</span>.
+                    TANAH UNTUK <span class="text-flag-500">Penggarap</span>.
                 </div>
                 <p class="mt-3 font-mono tracking-widest uppercase text-xs text-paper-200">
-                    Sejak 1999 — Serikat Pekerja Tani Karawang
+                    Sejak 2007: Serikat Pekerja Tani Karawang
                 </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
                 <div class="md:col-span-2">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 bg-flag-500 flex items-center justify-center">
-                            <span class="font-display text-paper-50 text-xl leading-none">S</span>
+                        <div class="w-10 h-10 border-2 border-paper-50/30 overflow-hidden bg-flag-500 flex-shrink-0">
+                            @include('partials.logo-mark')
                         </div>
                         <div>
                             <div class="font-display text-xl tracking-wider">SEPETAK</div>
@@ -169,7 +177,7 @@
                         </div>
                     </div>
                     <p class="text-sm leading-relaxed text-paper-200 max-w-md">
-                        {{ \App\Models\SiteSetting::getValue('site_tagline', 'Pekerja Tani Soko Guru Pembebasan — berjuang bersama untuk reforma agraria, keadilan sosial, dan kedaulatan pangan di Karawang.') }}
+                        {{ \App\Models\SiteSetting::getValue('site_tagline', 'Pekerja Tani Soko Guru Pembebasan: berjuang bersama untuk reforma agraria, keadilan sosial, dan kedaulatan pangan di Karawang.') }}
                     </p>
                 </div>
 
@@ -177,9 +185,9 @@
                     <h4 class="font-display text-lg tracking-widest text-flag-500 mb-4 uppercase">Navigasi</h4>
                     <ul class="space-y-2 text-sm font-mono uppercase tracking-wider">
                         <li><a href="{{ route('beranda') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Beranda</a></li>
-                        <li><a href="{{ route('posts.index') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Berita</a></li>
+                        <li><a href="{{ route('posts.index') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Artikel</a></li>
                         <li><a href="{{ route('pages.show', 'tentang-kami') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Tentang</a></li>
-                        <li><a href="{{ route('pages.show', 'visi-misi') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Visi &amp; Misi</a></li>
+                        <li><a href="{{ route('pages.show', 'visi-misi') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Visi dan Misi</a></li>
                         <li><a href="{{ route('pages.show', 'sejarah') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Sejarah</a></li>
                         <li><a href="{{ route('pages.show', 'struktur-organisasi') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Struktur</a></li>
                         <li><a href="{{ route('pages.show', 'wilayah-kerja') }}" class="text-paper-100 hover:text-flag-400 hover:underline">Wilayah Kerja</a></li>

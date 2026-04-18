@@ -18,7 +18,8 @@ class SettingsPage extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static ?string $navigationGroup = 'Sistem';
+    /** Harus cocok dengan salah satu label di AdminPanelProvider::navigationGroups. */
+    protected static ?string $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 90;
 
@@ -40,7 +41,8 @@ class SettingsPage extends Page implements HasForms
         // Umum
         'site_name' => ['Nama Situs', 'umum', 'text', 'Digunakan untuk title, og:site_name, dan footer.'],
         'site_tagline' => ['Tagline / Moto', 'umum', 'text', 'Kalimat singkat identitas organisasi.'],
-        'site_description' => ['Deskripsi Situs', 'umum', 'textarea', 'Digunakan di meta description & og:description default.'],
+        'site_description' => ['Deskripsi Situs (meta)', 'umum', 'textarea', 'Ringkas (±160–240 karakter disarankan) untuk meta description, Open Graph, dan JSON-LD.'],
+        'hero_intro' => ['Teks ringkas di bawah judul hero', 'umum', 'textarea', 'Satu atau dua kalimat di bawah headline beranda; tidak memakai field deskripsi meta.'],
         'founded_year' => ['Tahun Berdiri', 'umum', 'text', 'Contoh: 2007'],
 
         // Kontak

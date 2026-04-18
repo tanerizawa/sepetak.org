@@ -42,7 +42,7 @@ class PublicProfilePagesSeeder extends Seeder
                 'body' => StrukturOrganisasiPageContent::body(),
             ],
             'wilayah-kerja' => [
-                'title' => 'Wilayah Kerja & Pemetaan Konflik',
+                'title' => 'Wilayah Kerja dan Pemetaan Konflik',
                 'body' => WilayahKerjaPageContent::body(),
             ],
             'anggaran-dasar-dan-rumah-tangga' => [

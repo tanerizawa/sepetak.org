@@ -1,67 +1,155 @@
 @extends('layouts.app')
 
-@section('title', 'Berita & Artikel - ' . \App\Models\SiteSetting::getValue('site_name', 'SEPETAK'))
-@section('meta_description', 'Kumpulan berita, artikel, dan informasi terkini dari SEPETAK seputar perjuangan hak-hak petani Karawang.')
+@section('title', 'Artikel — ' . \App\Models\SiteSetting::getValue('site_name', 'SEPETAK'))
+@section('meta_description', 'Kumpulan artikel SEPETAK: organisasi, perjuangan agraria, panduan anggota, dan kajian ilmiah atau analitis seputar pekerja tani di Kabupaten Karawang.')
 
 @section('content')
 
-{{-- Header --}}
-<section class="bg-gradient-to-br from-primary-800 to-primary-600 text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
-        <nav class="text-sm text-primary-200 mb-4">
-            <a href="{{ route('beranda') }}" class="hover:text-white">Beranda</a>
-            <span class="mx-2">/</span>
-            <span class="text-white">Berita</span>
+@php
+    $hasFilters = filled($q ?? null) || filled($activeCategory ?? null) || filled($activeTag ?? null);
+@endphp
+
+{{-- Masthead — selaras archive / detail artikel (poster, bukan gradasi hijau lama) --}}
+<section class="relative bg-paper-50 border-b-4 border-ink-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <nav class="meta-stamp mb-5 flex flex-wrap items-center gap-2">
+            <a href="{{ route('beranda') }}" class="hover:underline">Beranda</a>
+            <span class="text-flag-500">//</span>
+            <span class="text-ink-900">Artikel</span>
         </nav>
-        <h1 class="text-4xl lg:text-5xl font-extrabold leading-tight mb-3">Berita & Artikel</h1>
-        <p class="text-primary-100 text-lg max-w-2xl">
-            Informasi, berita, dan perkembangan terbaru seputar perjuangan SEPETAK dan hak-hak petani Karawang.
-        </p>
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+            <div class="min-w-0">
+                <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl leading-[0.9] uppercase text-ink-900 tracking-tight">
+                    <span class="text-flag-600">Artikel</span> SEPETAK
+                </h1>
+                <p class="mt-4 max-w-2xl text-ink-700 text-base sm:text-lg leading-relaxed">
+                    Publikasi resmi berupa tulisan organisasi, materi advokasi, panduan anggota, serta kajian ilmiah atau analitis; bukan liputan berita harian.
+                </p>
+            </div>
+            <a
+                href="{{ url('/feed.xml') }}"
+                class="inline-flex items-center gap-2 self-start lg:self-end font-mono text-[0.65rem] uppercase tracking-widest text-ink-900 border-2 border-ink-900 px-3 py-2 hover:bg-flag-500 hover:text-paper-50 hover:border-flag-500 transition-colors"
+            >
+                <x-rev.icon name="megaphone" size="14" class="shrink-0"/>
+                RSS Artikel
+            </a>
+        </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+        <div class="border-t-4 border-flag-500"></div>
     </div>
 </section>
 
-{{-- Content --}}
-<section class="py-14">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+{{-- Filter — satu baris: gulir horizontal di layar sangat sempit --}}
+<section class="bg-paper-100 border-b-4 border-ink-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+        <form
+            method="get"
+            action="{{ route('posts.index') }}"
+            class="flex flex-nowrap items-stretch gap-2 sm:gap-3 overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch]"
+            role="search"
+            aria-label="Saring artikel"
+        >
+            <label for="filter-q" class="sr-only">Cari judul atau isi</label>
+            <input
+                id="filter-q"
+                type="search"
+                name="q"
+                value="{{ $q }}"
+                placeholder="Cari…"
+                title="Cari judul atau isi"
+                autocomplete="off"
+                class="posts-filter-field min-w-[10rem] flex-1 basis-0 border-4 border-ink-900 bg-paper-50 px-3 text-sm text-ink-900 placeholder:text-ink-500 placeholder:font-mono placeholder:text-[0.65rem] placeholder:uppercase placeholder:tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-flag-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-100"
+            />
 
+            <label for="filter-category" class="sr-only">Kategori</label>
+            <select
+                id="filter-category"
+                name="category"
+                title="Kategori"
+                class="posts-filter-field w-36 sm:w-44 shrink-0 border-4 border-ink-900 bg-paper-50 px-2 sm:px-3 text-sm text-ink-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-flag-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-100"
+            >
+                <option value="">Semua kategori</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat->slug }}" @selected($activeCategory === $cat->slug)>{{ $cat->name }}</option>
+                @endforeach
+            </select>
+
+            <label for="filter-tag" class="sr-only">Tag</label>
+            <select
+                id="filter-tag"
+                name="tag"
+                title="Tag"
+                class="posts-filter-field w-32 sm:w-36 shrink-0 border-4 border-ink-900 bg-paper-50 px-2 sm:px-3 text-sm text-ink-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-flag-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-100"
+            >
+                <option value="">Semua tag</option>
+                @foreach($tags as $tag)
+                    <option value="{{ $tag->slug }}" @selected($activeTag === $tag->slug)>{{ $tag->name }}</option>
+                @endforeach
+            </select>
+
+            <button
+                type="submit"
+                class="posts-filter-field shrink-0 border-4 border-ink-900 bg-flag-500 px-4 font-display text-xs sm:text-sm uppercase tracking-wider text-paper-50 shadow-poster-sm hover:bg-flag-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-100"
+            >
+                Cari
+            </button>
+
+            @if($hasFilters)
+                <a
+                    href="{{ route('posts.index') }}"
+                    class="posts-filter-field inline-flex shrink-0 items-center justify-center border-4 border-ink-900 bg-paper-50 px-3 font-mono text-[0.65rem] uppercase tracking-wider text-flag-600 hover:bg-paper-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-flag-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-100"
+                    title="Hapus semua filter"
+                >
+                    Reset
+                </a>
+            @endif
+        </form>
+    </div>
+</section>
+
+{{-- Daftar kartu — sama seperti arsip kategori/tag --}}
+<section class="py-16 bg-paper-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         @if($posts->count())
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($posts as $post)
-                    <article class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 overflow-hidden group flex flex-col">
-                        <div class="bg-gradient-to-br from-primary-100 to-primary-200 h-44 flex items-center justify-center">
-                            <svg class="w-16 h-16 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-                            </svg>
+                    @php
+                        $cover = $post->getFirstMediaUrl('cover');
+                        $dateLabel = $post->published_at ? $post->published_at->translatedFormat('d F Y') : '—';
+                        $excerptPlain = $post->excerpt ? strip_tags($post->excerpt) : '';
+                        $excerptShort = $excerptPlain !== '' ? \Illuminate\Support\Str::limit($excerptPlain, 200) : null;
+                    @endphp
+                    <x-rev.card
+                        :href="route('posts.show', $post->slug)"
+                        :image="$cover ?: null"
+                        :image-alt="$post->title"
+                        :meta="$dateLabel"
+                        :title="$post->title"
+                        :excerpt="$excerptShort"
+                    >
+                        <div class="mt-4 flex items-center gap-2 font-display uppercase tracking-widest text-sm text-flag-600">
+                            Baca selengkapnya
+                            <x-rev.icon name="arrow-right" size="14"/>
                         </div>
-                        <div class="p-5 flex flex-col flex-1">
-                            <time class="text-xs text-gray-400 font-medium">
-                                {{ $post->published_at ? $post->published_at->translatedFormat('d F Y') : '' }}
-                            </time>
-                            <h3 class="text-lg font-semibold text-gray-900 mt-1 mb-2 group-hover:text-primary-700 transition-colors line-clamp-2">
-                                {{ $post->title }}
-                            </h3>
-                            @if($post->excerpt)
-                                <p class="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3">{{ $post->excerpt }}</p>
-                            @endif
-                            <a href="{{ route('posts.show', $post->slug) }}" class="mt-auto inline-flex items-center gap-1 text-primary-600 hover:text-primary-800 text-sm font-medium transition-colors">
-                                Baca Selengkapnya
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                            </a>
-                        </div>
-                    </article>
+                    </x-rev.card>
                 @endforeach
             </div>
 
-            <div class="mt-10">
+            <div class="mt-12 border-t-2 border-ink-900/10 pt-8 font-mono text-sm text-ink-800 [&_a]:text-flag-600 [&_a:hover]:underline [&_span]:text-ink-600">
                 {{ $posts->links() }}
             </div>
         @else
-            <div class="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
-                <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-                </svg>
-                <h3 class="text-lg font-semibold text-gray-700 mb-1">Belum ada berita</h3>
-                <p class="text-gray-500">Berita dan artikel akan ditampilkan di sini setelah dipublikasikan.</p>
+            <div class="border-4 border-dashed border-ink-900 bg-paper-100 p-12 sm:p-16 text-center">
+                <x-rev.icon name="megaphone" size="64" class="mx-auto text-ink-900 mb-4"/>
+                <h2 class="font-display text-3xl uppercase text-ink-900 mb-2">Belum ada artikel</h2>
+                <p class="text-ink-700 max-w-md mx-auto leading-relaxed">
+                    @if($hasFilters)
+                        Tidak ada artikel yang cocok dengan filter Anda. Ubah kata kunci atau <a href="{{ route('posts.index') }}" class="text-flag-600 underline decoration-2 underline-offset-2 hover:text-flag-700">hapus filter</a>.
+                    @else
+                        Artikel akan tampil di sini setelah redaksi mempublikasikannya.
+                    @endif
+                </p>
             </div>
         @endif
     </div>

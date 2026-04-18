@@ -232,14 +232,180 @@
         margin: 1.5rem 0;
     }
 
-    /* Drop cap untuk paragraf pertama artikel */
-    .prose-rev p:first-of-type::first-letter {
+    /* Drop cap untuk paragraf pertama — halaman statis / teks pendek */
+    .prose-rev:not(.prose-rev--article) > p:first-of-type::first-letter {
         font-family: Anton, sans-serif;
         font-size: 4.5rem;
         line-height: 1;
         float: left;
         padding-right: 0.5rem;
         color: #C8102E;
+    }
+
+    /* ------------------------------------------------------------------------
+     * Prose khusus halaman artikel (Markdown AI + masthead judul terpisah).
+     * ------------------------------------------------------------------------*/
+    .prose-rev--article {
+        max-width: none;
+        width: 100%;
+    }
+    /* Rata kiri-kanan — tubuh teks ilmiah; judul tetap kiri */
+    .prose-rev--article p,
+    .prose-rev--article li,
+    .prose-rev--article dd,
+    .prose-rev--article blockquote {
+        text-align: justify;
+        text-wrap: pretty;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+        hyphenate-limit-chars: 8 4 4;
+    }
+    .prose-rev--article h1,
+    .prose-rev--article h2,
+    .prose-rev--article h3,
+    .prose-rev--article h4,
+    .prose-rev--article th,
+    .prose-rev--article td,
+    .prose-rev--article figcaption {
+        text-align: start;
+        hyphens: manual;
+    }
+    .prose-rev--article h2,
+    .prose-rev--article h3,
+    .prose-rev--article h4 {
+        scroll-margin-top: 5.5rem;
+    }
+    .prose-rev--article hr {
+        border: 0;
+        border-top: 3px solid #0D0D0D;
+        opacity: 0.22;
+        margin: 2.25rem 0;
+    }
+    .prose-rev--article hr.article-disclosure-divider {
+        opacity: 1;
+        border-top-color: #C8102E;
+        margin: 2.5rem 0 1rem;
+    }
+    .prose-rev--article aside.article-disclosure,
+    .prose-rev--article .article-disclosure {
+        border: 3px solid #0D0D0D;
+        border-left: 6px solid #C8102E;
+        background: #F4EEDB;
+        padding: 1rem 1.25rem;
+        margin-top: 0;
+        font-size: 0.95rem;
+        line-height: 1.65;
+        font-style: italic;
+    }
+    .prose-rev--article table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.95rem;
+    }
+    .prose-rev--article th,
+    .prose-rev--article td {
+        border: 2px solid #0D0D0D;
+        padding: 0.5rem 0.65rem;
+        text-align: left;
+    }
+    .prose-rev--article th {
+        background: #FFF2F3;
+        font-family: "Space Mono", ui-monospace, monospace;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+    }
+
+    /* Tipografi ilmiah / editorial — penekanan, judul kecil, catatan. */
+    .prose-rev--article em,
+    .prose-rev--article i {
+        font-style: italic;
+        font-family: "Roboto Slab", ui-serif, Georgia, serif;
+    }
+    .prose-rev--article strong,
+    .prose-rev--article b {
+        font-weight: 700;
+        font-style: normal;
+        letter-spacing: 0.01em;
+    }
+    .prose-rev--article cite {
+        font-style: italic;
+        font-family: "Roboto Slab", ui-serif, Georgia, serif;
+    }
+    .prose-rev--article sup,
+    .prose-rev--article sub {
+        font-size: 0.75em;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+    }
+    .prose-rev--article sup { top: -0.35em; }
+    .prose-rev--article sub { top: 0.2em; }
+    .prose-rev--article h4 {
+        font-family: Anton, sans-serif;
+        text-transform: uppercase;
+        font-size: 1.125rem;
+        letter-spacing: 0.04em;
+        margin-top: 1.75rem;
+        margin-bottom: 0.65rem;
+        color: #0D0D0D;
+    }
+    .prose-rev--article blockquote strong,
+    .prose-rev--article blockquote b {
+        font-family: "Roboto Slab", ui-serif, Georgia, serif;
+        font-weight: 700;
+    }
+    /* Sitasi tanda kurung — sedikit jarak agar mudah dibaca */
+    .prose-rev--article p,
+    .prose-rev--article li {
+        hanging-punctuation: first last;
+    }
+
+    /* TOC — kolom aside diregangkan penuh tinggi baris grid (jangan align-self:start) */
+    .article-toc-aside {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+    .article-toc-nav {
+        position: sticky;
+        top: calc(4.25rem + env(safe-area-inset-top, 0px));
+        z-index: 30;
+        max-height: min(42vh, 17.5rem);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+        background: rgb(252 249 241 / 0.97);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow:
+            4px 4px 0 rgb(200 16 46 / 0.3),
+            0 0 0 1px rgb(13 13 13 / 0.08);
+    }
+    @media (min-width: 1024px) {
+        .article-toc-nav {
+            top: calc(4.5rem + env(safe-area-inset-top, 0px));
+            max-height: calc(100dvh - 5.75rem - env(safe-area-inset-bottom, 0px));
+            box-shadow:
+                6px 6px 0 rgb(200 16 46 / 0.35),
+                0 0 0 1px rgb(13 13 13 / 0.08);
+        }
+    }
+    .article-toc-nav .article-toc-link {
+        font-family: "Work Sans", sans-serif;
+        font-weight: 500;
+    }
+
+    /* Baris filter /artikel — tinggi & padding seragam */
+    .posts-filter-field {
+        min-height: 2.75rem;
+        box-sizing: border-box;
+        align-self: stretch;
+    }
+    .posts-filter-field:is(input, select) {
+        padding-top: 0.375rem;
+        padding-bottom: 0.375rem;
     }
 }
 

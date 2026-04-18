@@ -39,6 +39,7 @@ class PostController extends Controller
             'activeCategory' => $request->input('category'),
             'activeTag' => $request->input('tag'),
             'categories' => Category::orderBy('name')->get(),
+            'tags' => Tag::orderBy('name')->get(),
         ]);
     }
 

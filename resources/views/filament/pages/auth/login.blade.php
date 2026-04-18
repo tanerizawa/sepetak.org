@@ -21,7 +21,10 @@
 
     {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, scopes: $this->getRenderHookScopes()) }}
 
+    {{-- @csrf: form Filament default tidak menyertakan _token; submit HTML biasa ke URL
+         saat ini (POST /admin/login) tanpa ini → 419. Livewire tetap memakai /livewire/update. --}}
     <x-filament-panels::form id="form" wire:submit="authenticate" class="space-y-6">
+        @csrf
         {{ $this->form }}
 
         <x-filament-panels::form.actions

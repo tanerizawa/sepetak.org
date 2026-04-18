@@ -20,10 +20,10 @@ final class KontakPageContent
 
 <h3>Jalur komunikasi</h3>
 <ul>
-<li><strong>Pendaftaran anggota baru</strong> — gunakan formulir online di <a href="/daftar-anggota">halaman pendaftaran anggota</a>. Setelah mendaftar, calon anggota akan dihubungi oleh Departemen Internal untuk verifikasi dan penempatan Pokja.</li>
-<li><strong>Permohonan pendampingan kasus agraria</strong> — kirim ringkasan kasus (lokasi, pihak terlibat, kronologi, dokumen pendukung) ke email resmi. Akan ditangani oleh <strong>Departemen Perjuangan Tani</strong> (koordinasi advokasi, kampanye, dan aksi massa).</li>
-<li><strong>Liputan media &amp; kerja sama publikasi</strong> — ajukan permohonan resmi via email dengan mencantumkan institusi, nama pewarta/perwakilan, serta topik peliputan atau kolaborasi. Akan ditangani oleh jajaran <strong>Departemen Pendidikan, Penelitian, dan/atau Propaganda</strong> sesuai arahan sekretariat.</li>
-<li><strong>Solidaritas dan donasi</strong> — untuk dukungan sumber daya atau solidaritas aksi, silakan konfirmasi terlebih dahulu via email agar SEPETAK dapat memberi rekening resmi dan peruntukan yang transparan (koordinasi dengan <strong>Departemen Dana dan Usaha</strong>).</li>
+<li><strong>Pendaftaran anggota baru:</strong> gunakan formulir online di <a href="/daftar-anggota">halaman pendaftaran anggota</a>. Setelah mendaftar, calon anggota akan dihubungi oleh Departemen Internal untuk verifikasi dan penempatan Pokja.</li>
+<li><strong>Permohonan pendampingan kasus agraria:</strong> kirim ringkasan kasus (lokasi, pihak terlibat, kronologi, dokumen pendukung) ke email resmi. Permohonan akan ditangani oleh <strong>Departemen Perjuangan Tani</strong> (koordinasi advokasi, kampanye, dan aksi massa).</li>
+<li><strong>Liputan media dan kerja sama publikasi:</strong> ajukan permohonan resmi melalui email dengan mencantumkan institusi, nama pewarta atau perwakilan, serta topik peliputan atau kolaborasi. Permohonan akan ditangani oleh jajaran <strong>Departemen Pendidikan, Penelitian, dan/atau Propaganda</strong> sesuai arahan sekretariat.</li>
+<li><strong>Solidaritas dan donasi:</strong> untuk dukungan sumber daya atau solidaritas aksi, silakan konfirmasi terlebih dahulu melalui email agar SEPETAK dapat memberikan rekening resmi dan peruntukan yang transparan (koordinasi dengan <strong>Departemen Dana dan Usaha</strong>).</li>
 </ul>
 <p><em>Bila nomor telepon atau WhatsApp resmi tercantum di pengaturan situs, dapat digunakan untuk keperluan mendesak; selain itu komunikasi resmi utama berjalan melalui email dan kanal yang tertera di halaman ini.</em></p>
 HTML;

@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class SiteSettingResource extends Resource
 {
@@ -16,7 +17,7 @@ class SiteSettingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
 
-    protected static ?string $navigationGroup = 'Sistem';
+    protected static ?string $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 99;
 
@@ -72,10 +73,10 @@ class SiteSettingResource extends Resource
                     ->form([
                         Forms\Components\TextInput::make('group_name')->label('Grup'),
                     ])
-                    ->query(function ($query, array $data) {
+                    ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['group_name'] ?? null,
-                            fn ($q, $value) => $q->where('group_name', $value)
+                            fn (Builder $q, string $value): Builder => $q->where('group_name', $value)
                         );
                     }),
             ])

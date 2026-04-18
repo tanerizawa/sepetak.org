@@ -37,6 +37,10 @@ class HomeController extends Controller
             report($e);
         }
 
+        if (! config('sepetak.use_real_member_count_on_homepage')) {
+            $stats['member_count'] = (int) config('sepetak.homepage_member_count_display');
+        }
+
         return view('home', compact('latestPosts', 'stats'));
     }
 

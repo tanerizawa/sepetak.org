@@ -37,7 +37,7 @@
             'name'  => $siteName,
             'logo'  => [
                 '@type' => 'ImageObject',
-                'url'   => url('/favicon.ico'),
+                'url'   => asset('img/logo/logo-256.png').'?v='.urlencode((string) config('sepetak.logo_asset_version', '3')),
             ],
         ],
     ];
@@ -53,7 +53,7 @@
         '@type'           => 'BreadcrumbList',
         'itemListElement' => [
             ['@type' => 'ListItem', 'position' => 1, 'name' => 'Beranda',  'item' => route('beranda')],
-            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Berita',   'item' => route('posts.index')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Artikel',   'item' => route('posts.index')],
             ['@type' => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => route('posts.show', $post->slug)],
         ],
     ];

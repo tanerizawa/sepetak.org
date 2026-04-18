@@ -94,6 +94,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Publish Livewire assets
+        run: php artisan livewire:publish --assets --no-interaction
+
       - name: Prepare .env
         run: |
           cp .env.example .env

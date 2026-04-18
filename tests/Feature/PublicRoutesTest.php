@@ -20,31 +20,31 @@ class PublicRoutesTest extends TestCase
         $author = User::factory()->create();
 
         Post::create([
-            'title'        => 'Draft Tersembunyi',
-            'slug'         => 'draft-tersembunyi',
-            'body'         => '<p>draft</p>',
-            'status'       => 'draft',
-            'author_id'    => $author->id,
+            'title' => 'Draft Tersembunyi',
+            'slug' => 'draft-tersembunyi',
+            'body' => '<p>draft</p>',
+            'status' => 'draft',
+            'author_id' => $author->id,
         ]);
 
         Post::create([
-            'title'        => 'Berita Publik Uji',
-            'slug'         => 'berita-publik-uji',
-            'excerpt'      => 'Kutipan',
-            'body'         => '<p>publik</p>',
-            'status'       => 'published',
+            'title' => 'Artikel Publik Uji',
+            'slug' => 'artikel-publik-uji',
+            'excerpt' => 'Kutipan',
+            'body' => '<p>publik</p>',
+            'status' => 'published',
             'published_at' => now()->subHour(),
-            'author_id'    => $author->id,
+            'author_id' => $author->id,
         ]);
 
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('Berita Publik Uji');
+        $response->assertSee('Artikel Publik Uji');
         $response->assertDontSee('Draft Tersembunyi');
-        $response->assertSee('Lihat daftar kasus', false);
-        $response->assertSee('Lihat daftar program', false);
-        $response->assertSee('Total catatan di arsip organisasi', false);
+        $response->assertSee('Daftar kasus agraria', false);
+        $response->assertSee('Daftar program advokasi', false);
+        $response->assertSee('Informasi pendaftaran anggota', false);
     }
 
     public function test_homepage_renders_when_stats_cache_missing_new_case_keys(): void
@@ -58,7 +58,8 @@ class PublicRoutesTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('Kasus agraria aktif', false);
+        $response->assertSee('Daftar kasus agraria', false);
+        $response->assertSee(route('agrarian-cases.index', [], false), false);
     }
 
     public function test_agrarian_cases_index_renders(): void
@@ -89,8 +90,8 @@ class PublicRoutesTest extends TestCase
         $response->assertOk();
         $response->assertSee('ORG-ADV-TEST');
         $response->assertSee('Kasus Uji Publik');
-        $response->assertSee('Ringkasan status', false);
-        $response->assertSee('2 catatan', false);
+        $response->assertSee('Ringkasan publik', false);
+        $response->assertSee('Kasus Tertutup Uji', false);
         $response->assertSee('Dilaporkan', false);
         $response->assertSee('Ditutup', false);
     }
@@ -168,12 +169,12 @@ class PublicRoutesTest extends TestCase
         $author = User::factory()->create();
         for ($i = 1; $i <= 3; $i++) {
             Post::create([
-                'title'        => "Post {$i}",
-                'slug'         => "post-{$i}",
-                'body'         => "<p>{$i}</p>",
-                'status'       => 'published',
+                'title' => "Post {$i}",
+                'slug' => "post-{$i}",
+                'body' => "<p>{$i}</p>",
+                'status' => 'published',
                 'published_at' => now()->subDays($i),
-                'author_id'    => $author->id,
+                'author_id' => $author->id,
             ]);
         }
 
@@ -188,11 +189,11 @@ class PublicRoutesTest extends TestCase
     {
         $author = User::factory()->create();
         Post::create([
-            'title'        => 'Belum Tayang',
-            'slug'         => 'belum-tayang',
-            'body'         => '<p>x</p>',
-            'status'       => 'draft',
-            'author_id'    => $author->id,
+            'title' => 'Belum Tayang',
+            'slug' => 'belum-tayang',
+            'body' => '<p>x</p>',
+            'status' => 'draft',
+            'author_id' => $author->id,
         ]);
 
         $this->get(route('posts.show', 'belum-tayang'))->assertNotFound();
@@ -202,12 +203,12 @@ class PublicRoutesTest extends TestCase
     {
         $author = User::factory()->create();
         Page::create([
-            'title'        => 'Tentang Uji',
-            'slug'         => 'tentang-uji',
-            'body'         => '<p>konten tentang</p>',
-            'status'       => 'published',
+            'title' => 'Tentang Uji',
+            'slug' => 'tentang-uji',
+            'body' => '<p>konten tentang</p>',
+            'status' => 'published',
             'published_at' => now()->subHour(),
-            'author_id'    => $author->id,
+            'author_id' => $author->id,
         ]);
 
         $response = $this->get(route('pages.show', 'tentang-uji'));

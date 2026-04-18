@@ -23,7 +23,7 @@
 >
     <title id="landscape-hero-title">Pemandangan Karawang: sawah, pesisir, dan petani</title>
     <desc id="landscape-hero-desc">
-        Ilustrasi gaya realisme sosialis: siluet seorang pekerja tani memanggul cangkul dengan sudut
+        Ilustrasi gaya realisme sosialis: siluet seorang pekerja tani memangkul dengan sudut
         pandang rendah di atas pematang sawah, matahari terbit besar di belakang bukit Purwakarta,
         barisan padi yang dipanen, dan satu perahu nelayan kecil di garis pesisir utara.
     </desc>

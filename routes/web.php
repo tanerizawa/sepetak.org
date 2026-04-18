@@ -8,20 +8,27 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberRegistrationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
+use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('beranda');
 
+Route::permanentRedirect('/halaman/kontak', '/kontak');
+Route::get('/kontak', [ContactController::class, 'show'])->name('contact.show');
 Route::get('/halaman/{slug}', [PageController::class, 'show'])->name('pages.show');
-Route::get('/halaman/kontak', [PageController::class, 'show'])->defaults('slug', 'kontak')->name('contact.show');
 
 Route::get('/daftar-anggota', [MemberRegistrationController::class, 'create'])->name('member-registration.create');
 Route::post('/daftar-anggota', [MemberRegistrationController::class, 'store'])->name('member-registration.store');
+
+Route::permanentRedirect('/berita', '/artikel');
+Route::permanentRedirect('/berita/{slug}', '/artikel/{slug}');
 
 Route::get('/artikel', [PostController::class, 'index'])->name('posts.index');
 Route::get('/artikel/penulis/{id}', [PostController::class, 'author'])->whereNumber('id')->name('posts.author');
@@ -50,21 +57,46 @@ Route::redirect('/login', '/admin/login')->name('login');
 Route::redirect('/masuk', '/admin/login');
 Route::redirect('/admin/logout', '/admin');
 
-// Filament authentication POST fallback
-// Normally Livewire handles this, but we provide a fallback for:
-// - JavaScript disabled
-// - Direct form posts
-// - API/bot login attempts
+/*
+ * POST /admin/login — fallback otentikasi HTML klasik (tanpa Livewire / JS bermasalah).
+ * Filament hanya mendaftarkan GET /admin/login; tanpa rute ini, POST dari browser → 405.
+ * Livewire login normal tetap memakai POST /livewire/update.
+ */
 Route::post('/admin/login', function (Request $request) {
-    // Attempt authentication if credentials provided
-    if ($request->has('email') && $request->has('password')) {
-        $credentials = $request->only('email', 'password');
-        if (auth()->attempt($credentials, $request->boolean('remember'))) {
-            return redirect('/admin');
-        }
+    $validated = $request->validate([
+        'email' => ['required', 'string', 'email'],
+        'password' => ['required', 'string'],
+        'remember' => ['nullable'],
+    ]);
+
+    if (! auth()->attempt(
+        ['email' => $validated['email'], 'password' => $validated['password']],
+        $request->boolean('remember'),
+    )) {
+        return redirect()
+            ->to(Filament::getPanel('admin')->getLoginUrl() ?? '/admin/login')
+            ->withErrors(['data.email' => __('filament-panels::pages/auth/login.messages.failed')])
+            ->withInput(['data' => ['email' => $validated['email']]]);
     }
-    // Fallback: redirect back to login page
-    return redirect('/admin/login');
+
+    $request->session()->regenerate();
+
+    /** @var User|null $user */
+    $user = auth()->user();
+    $panel = Filament::getPanel('admin');
+
+    if (! $user || ! $user->canAccessPanel($panel)) {
+        auth()->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()
+            ->to(Filament::getPanel('admin')->getLoginUrl() ?? '/admin/login')
+            ->withErrors(['data.email' => __('filament-panels::pages/auth/login.messages.failed')])
+            ->withInput(['data' => ['email' => $validated['email']]]);
+    }
+
+    return redirect()->intended(Filament::getPanel('admin')->getUrl());
 })->name('admin.login.post');
 
 Route::middleware(['auth'])->group(function (): void {

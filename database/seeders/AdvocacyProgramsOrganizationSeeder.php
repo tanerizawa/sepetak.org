@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Mengisi program advokasi organisasi dari kurasi docs/ADVOCACY_PROGRAMS_RESEARCH.md.
- * Idempotent: updateOrCreate berdasarkan program_code ORG-PRG-001 … ORG-PRG-012.
+ * Idempotent: updateOrCreate berdasarkan program_code ORG-PRG-001 … ORG-PRG-018.
  */
 class AdvocacyProgramsOrganizationSeeder extends Seeder
 {
@@ -75,6 +75,16 @@ class AdvocacyProgramsOrganizationSeeder extends Seeder
         if ($p = $link('ORG-PRG-002')) {
             $mk($p, '2016-04-25', 'meeting', 'Kongres III: rumusan visi “Rebut Kedaulatan Agraria, Bangun Industrialisasi Pertanian” & pemetaan wilayah rawan.');
         }
+        if ($p = $link('ORG-PRG-013')) {
+            $mk($p, '2021-06-01', 'meeting', 'Respons kebijakan PJT II terhadap tanam padi di Pakisjaya; koordinasi dengan pemangku kebijakan daerah (ORG-ADV-033).');
+        }
+        if ($p = $link('ORG-PRG-015')) {
+            $mk($p, '2016-04-01', 'legal', 'Pengaduan ke KPK, Mabes Polri, dan Komnas HAM bersama massa tiga desa (ORG-ADV-031).');
+            $mk($p, '2022-10-15', 'legal', 'Pendampingan administrasi tanah bersama LBH Cakra di BPN Karawang (ORG-ADV-034).');
+        }
+        if ($p = $link('ORG-PRG-016')) {
+            $mk($p, '2025-10-01', 'meeting', 'Rakor Kementerian ATR/BPN — narasi reforma agraria Karawang (ORG-ADV-037).');
+        }
     }
 
     /**
@@ -91,7 +101,7 @@ class AdvocacyProgramsOrganizationSeeder extends Seeder
      */
     private function programRows(): array
     {
-        $foot = "\n\n<p><em>— Diimpor dari kurasi repositori (docs/ADVOCACY_PROGRAMS_RESEARCH.md, April 2026). Sesuaikan di admin setelah verifikasi sekretariat.</em></p>";
+        $foot = "\n\n<p><em>Data diimpor dari kurasi repositori internal (April 2026). Sesuaikan dan verifikasi melalui panel admin setelah persetujuan sekretariat.</em></p>";
 
         return [
             [
@@ -203,6 +213,60 @@ class AdvocacyProgramsOrganizationSeeder extends Seeder
                 'start_date' => '2009-01-01',
                 'end_date' => '2010-12-31',
                 'location_text' => 'Tegalwaru, Karawang Selatan',
+                'assign_lead' => false,
+            ],
+            [
+                'program_code' => 'ORG-PRG-013',
+                'title' => 'Advokasi hak air irigasi dan tata kelola waduk (Pakisjaya & sekitarnya)',
+                'description' => '<p>Pendampingan rumah tangga tani terkait alokasi air irigasi dari sistem Jatiluhur; menanggapi kebijakan operator waduk (<strong>PJT II</strong>) yang berdampak pada musim tanam, serta mendorong peran <strong>Komisi Irigasi (Komir)</strong> dan koordinasi perencanaan di tingkat daerah.</p><p><strong>Departemen (usulan):</strong> perjuangan tani, penelitian.</p>'.$foot,
+                'status' => 'active',
+                'start_date' => '2021-01-01',
+                'location_text' => 'Kec. Pakisjaya & basis irigasi Karawang',
+                'assign_lead' => false,
+            ],
+            [
+                'program_code' => 'ORG-PRG-014',
+                'title' => 'Advokasi lingkungan hidup dan pencemaran industri',
+                'description' => '<p>Kampanye dan pendampingan terkait kualitas perairan (termasuk sungai utama di wilayah kerja), limbah berbahaya dan beracun, serta pelestarian lingkungan pedesaan sebagai bagian dari ketahanan basis.</p><p><strong>Departemen (usulan):</strong> propaganda, penelitian, perjuangan tani.</p>'.$foot,
+                'status' => 'active',
+                'start_date' => '2010-01-01',
+                'location_text' => 'Kabupaten Karawang',
+                'assign_lead' => false,
+            ],
+            [
+                'program_code' => 'ORG-PRG-015',
+                'title' => 'Litigasi dan bantuan hukum bersama lembaga bantuan hukum',
+                'description' => '<p>Pendampingan perkara dan administrasi hukum bersama mitra seperti <strong>LBH Arya Mandalika</strong>, <strong>LBH Cakra</strong>, dan <strong>LBH Street Lawyer</strong>, termasuk gugatan perdata massa tani, pengaduan ke lembaga antikorupsi dan HAM, serta administrasi perkara kriminalisasi.</p><p><strong>Departemen (usulan):</strong> perjuangan tani (koordinasi eksternal).</p>'.$foot,
+                'status' => 'active',
+                'start_date' => '2013-01-01',
+                'location_text' => 'Karawang & forum hukum nasional',
+                'assign_lead' => false,
+            ],
+            [
+                'program_code' => 'ORG-PRG-016',
+                'title' => 'Reforma agraria: IP4T, LPRA, One Map Policy, dan badan pelaksana',
+                'description' => '<p>Mendorong <strong>inventarisasi penguasaan, pemilikan, penggunaan, dan pemanfaatan tanah (IP4T)</strong> atas tanah petani di kawasan berklaim hutan; mengadvokasi penetapan <strong>lokasi prioritas reforma agraria (LPRA)</strong>; serta mendukung kebijakan <strong>One Map Policy</strong> dan pembentukan <strong>badan pelaksana reforma agraria</strong> sejalan dengan notulen rapat koordinasi tingkat kabupaten dan nasional.</p><p><strong>Departemen (usulan):</strong> penelitian, perjuangan tani.</p>'.$foot,
+                'status' => 'active',
+                'start_date' => '2015-01-01',
+                'location_text' => 'Kabupaten Karawang',
+                'assign_lead' => false,
+            ],
+            [
+                'program_code' => 'ORG-PRG-017',
+                'title' => 'Jaringan sipil, HAM, dan solidaritas lintas sektor',
+                'description' => '<p>Memperluas kerja sama advokasi dengan mitra seperti <strong>KontraS</strong>, <strong>YLBHI</strong>, <strong>Bina Desa</strong>, <strong>WALHI</strong>, <strong>ELSAM</strong>, <strong>IHCS</strong>, <strong>SERBUK</strong>, <strong>SETAKAR</strong>, <strong>AGRA</strong>, <strong>FPBI</strong>, <strong>GMNI</strong>, serta berbagai organisasi mahasiswa — tanpa menyamakan seluruh posisi mitra dengan kebijakan resmi harian DPTK.</p><p><strong>Departemen (usulan):</strong> perjuangan tani, propaganda.</p>'.$foot,
+                'status' => 'active',
+                'start_date' => '2007-12-10',
+                'location_text' => 'Nasional & Jawa Barat',
+                'assign_lead' => false,
+            ],
+            [
+                'program_code' => 'ORG-PRG-018',
+                'title' => 'Komunikasi publik, propaganda digital, dan dokumentasi',
+                'description' => '<p>Penguatan kanal komunikasi resmi (situs <strong>sepetak.or.id</strong>, media sosial, poster, dan materi grafis kritis) untuk mendiseminasikan analisis agraria, memobilisasi solidaritas, dan mendokumentasikan aksi lapangan.</p><p><strong>Departemen (usulan):</strong> propaganda, pendidikan.</p>'.$foot,
+                'status' => 'active',
+                'start_date' => '2012-01-01',
+                'location_text' => 'Kabupaten Karawang (jaringan daring)',
                 'assign_lead' => false,
             ],
         ];

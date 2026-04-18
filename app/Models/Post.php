@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PostBodyHtml;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -74,5 +75,19 @@ class Post extends Model implements HasMedia
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'post_tag');
+    }
+
+    /**
+     * @return array{html: string, toc: list<array{id: string, text: string, level: 2|3|4}>}
+     */
+    public function articlePresentationForPublic(): array
+    {
+        return PostBodyHtml::articlePresentation((string) $this->body, (string) $this->title);
+    }
+
+    /** HTML isi siap tampil publik (tanpa judul ganda, anchor heading). */
+    public function bodyForPublicDisplay(): string
+    {
+        return $this->articlePresentationForPublic()['html'];
     }
 }

@@ -22,7 +22,7 @@
         <nav class="meta-stamp mb-6 flex items-center gap-2">
             <a href="{{ route('beranda') }}" class="hover:underline">Beranda</a>
             <span class="text-flag-500">//</span>
-            <a href="{{ route('posts.index') }}" class="hover:underline">Berita</a>
+            <a href="{{ route('posts.index') }}" class="hover:underline">Artikel</a>
             <span class="text-flag-500">//</span>
             <span class="line-clamp-1 max-w-xs">{{ $post->title }}</span>
         </nav>
@@ -44,11 +44,6 @@
                 <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl leading-[0.92] uppercase tracking-tight text-ink-900">
                     {{ $post->title }}
                 </h1>
-                @if($post->excerpt)
-                    <p class="mt-6 text-lg sm:text-xl text-ink-700 leading-relaxed max-w-2xl">
-                        {{ $post->excerpt }}
-                    </p>
-                @endif
             </div>
 
             @if ($cover)
@@ -69,24 +64,54 @@
     </div>
 </section>
 
-{{-- Body --}}
+@php($presentation = $post->articlePresentationForPublic())
+{{-- Body: isi + TOC sticky kanan (desktop); TOC atas pada layar sempit --}}
 <article class="py-14 bg-paper-50">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="prose-rev">
-            {!! $post->body !!}
-        </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {{-- items-stretch: kolom TOC setinggi isi artikel agar position:sticky TOC berjalan penuh --}}
+        <div class="grid gap-10 lg:gap-12 lg:grid-cols-[minmax(0,1fr)_min(17rem,32%)] lg:items-stretch">
+            @if(! empty($presentation['toc']))
+                <aside class="article-toc-aside lg:col-start-2 lg:row-start-1 order-first lg:order-none lg:h-full lg:min-h-0">
+                    <nav
+                        class="article-toc-nav border-4 border-ink-900 p-4"
+                        aria-labelledby="article-toc-heading"
+                    >
+                        <p id="article-toc-heading" class="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-ink-600 mb-3 pb-2 border-b-2 border-flag-500">
+                            Daftar isi
+                        </p>
+                        <ol class="list-none m-0 p-0 space-y-2 text-sm leading-snug">
+                            @foreach($presentation['toc'] as $entry)
+                                @php($lvl = (int) ($entry['level'] ?? 2))
+                                <li class="{{ $lvl >= 4 ? 'pl-6 border-l-2 border-ink-900/15 ml-1' : ($lvl === 3 ? 'pl-3 border-l-2 border-ink-900/15 ml-1' : '') }}">
+                                    <a
+                                        href="#{{ $entry['id'] }}"
+                                        class="article-toc-link text-ink-800 hover:text-flag-600 underline decoration-ink-900/25 decoration-2 underline-offset-2 hover:decoration-flag-500"
+                                    >{{ $entry['text'] }}</a>
+                                </li>
+                            @endforeach
+                        </ol>
+                    </nav>
+                </aside>
+            @endif
 
-        <hr class="my-12 border-t-4 border-ink-900">
+            <div class="lg:col-start-1 lg:row-start-1 order-last lg:order-none min-w-0">
+                <div class="prose-rev prose-rev--article max-w-none">
+                    {!! $presentation['html'] !!}
+                </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <a href="{{ route('posts.index') }}" class="inline-flex items-center gap-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-flag-500 pb-1">
-                <x-rev.icon name="arrow-right" size="14" class="rotate-180"/>
-                Kembali ke Daftar Berita
-            </a>
-            <x-rev.btn :href="route('member-registration.create')" variant="red">
-                <x-rev.icon name="signature" size="18"/>
-                Gabung SEPETAK
-            </x-rev.btn>
+                <hr class="my-12 border-t-4 border-ink-900">
+
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <a href="{{ route('posts.index') }}" class="inline-flex items-center gap-2 font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-flag-500 pb-1">
+                        <x-rev.icon name="arrow-right" size="14" class="rotate-180"/>
+                        Kembali ke daftar artikel
+                    </a>
+                    <x-rev.btn :href="route('member-registration.create')" variant="red">
+                        <x-rev.icon name="signature" size="18"/>
+                        Gabung SEPETAK
+                    </x-rev.btn>
+                </div>
+            </div>
         </div>
     </div>
 </article>

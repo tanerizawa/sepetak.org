@@ -13,6 +13,7 @@ class FeedController extends Controller
     {
         $urls = [
             ['loc' => route('beranda'), 'priority' => '1.0', 'changefreq' => 'weekly'],
+            ['loc' => route('contact.show'), 'priority' => '0.85', 'changefreq' => 'monthly'],
             ['loc' => route('posts.index'), 'priority' => '0.9', 'changefreq' => 'daily'],
             ['loc' => route('events.index'), 'priority' => '0.7', 'changefreq' => 'weekly'],
             ['loc' => route('gallery.index'), 'priority' => '0.7', 'changefreq' => 'weekly'],

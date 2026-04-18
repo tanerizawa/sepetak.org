@@ -20,6 +20,9 @@
 #   NPM_BIN        (default: npm)
 #   SKIP_NPM       (default: 0) set ke 1 jika build asset dilakukan di CI
 #   SKIP_MIGRATE   (default: 0) set ke 1 jika migrasi dijalankan manual
+#   WEB_USER       (default: www-data) — pemilik storage/bootstrap; artisan
+#                  view:cache di bawah dijalankan sebagai user ini jika sudo -n ada,
+#                  supaya view terkompilasi bukan milik root (hindari Permission denied).
 #
 # Asumsi:
 #   - Script dijalankan oleh user yang bisa tulis ke ${APP_ROOT}/releases dan
@@ -35,6 +38,7 @@ COMPOSER_BIN="${COMPOSER_BIN:-composer}"
 NPM_BIN="${NPM_BIN:-npm}"
 SKIP_NPM="${SKIP_NPM:-0}"
 SKIP_MIGRATE="${SKIP_MIGRATE:-0}"
+WEB_USER="${WEB_USER:-www-data}"
 
 RELEASE_NAME="${1:-$(date -u +%Y%m%d%H%M%S)}"
 RELEASES_DIR="${APP_ROOT}/releases"
@@ -80,6 +84,9 @@ ln -sfn "${SHARED_DIR}/storage" "${NEW_RELEASE}/storage"
 log "4. composer install --no-dev --optimize-autoloader"
 ( cd "${NEW_RELEASE}" && ${COMPOSER_BIN} install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader )
 
+log "4b. Livewire front-end → public/vendor/livewire (hindari 404 jika /livewire/* tidak ke PHP)"
+( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan livewire:publish --assets --no-interaction ) || true
+
 if [[ "${SKIP_NPM}" != "1" ]]; then
   log "5. npm ci && npm run build"
   ( cd "${NEW_RELEASE}" && ${NPM_BIN} ci --no-audit --no-fund && ${NPM_BIN} run build )
@@ -98,14 +105,42 @@ else
 fi
 
 log "8. Cache produksi (config, route, view, event)"
-( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan config:cache )
-( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan route:cache )
-( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan view:cache )
-( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan event:cache ) || true
+# Pastikan target tulis dimiliki WEB_USER sebelum artisan (penting jika langkah
+# sebelumnya pernah di-root dan meninggalkan berkas root di shared storage).
+if [[ "$(id -u)" -eq 0 ]] || sudo -n true 2>/dev/null; then
+  if [[ "$(id -u)" -eq 0 ]]; then
+    chown -R "${WEB_USER}:${WEB_USER}" "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage"
+    chmod -R ug+rwx "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage"
+  else
+    sudo -n chown -R "${WEB_USER}:${WEB_USER}" "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage"
+    sudo -n chmod -R ug+rwx "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage"
+  fi
+fi
 
-log "9. Permission storage + bootstrap/cache (775, group www-data)"
-chmod -R 775 "${NEW_RELEASE}/bootstrap/cache" || true
-chgrp -R www-data "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage" 2>/dev/null || true
+run_artisan_cache() {
+  local sub="$1"
+  if sudo -n -u "${WEB_USER}" true 2>/dev/null; then
+    sudo -n -u "${WEB_USER}" -- bash -c "cd \"${NEW_RELEASE}\" && ${PHP_BIN} artisan ${sub}"
+  else
+    ( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan "${sub}" )
+  fi
+}
+
+run_artisan_cache "config:cache"
+run_artisan_cache "route:cache"
+run_artisan_cache "view:cache"
+run_artisan_cache "event:cache" || true
+
+log "9. Ownership + permissions: shared storage + bootstrap/cache (${WEB_USER})"
+if [[ "$(id -u)" -eq 0 ]]; then
+  chown -R "${WEB_USER}:${WEB_USER}" "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage"
+  chmod -R ug+rwx "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage"
+elif sudo -n true 2>/dev/null; then
+  sudo -n chown -R "${WEB_USER}:${WEB_USER}" "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage"
+  sudo -n chmod -R ug+rwx "${NEW_RELEASE}/bootstrap/cache" "${SHARED_DIR}/storage"
+else
+  log "PERINGATAN: tidak root dan tanpa sudo NOPASSWD — pastikan ${WEB_USER} bisa tulis ke shared/storage dan bootstrap/cache (jalankan: sudo bash scripts/fix-storage-permissions.sh)."
+fi
 
 log "10. Symlink atomik: current → ${NEW_RELEASE}"
 ln -sfn "${NEW_RELEASE}" "${CURRENT_SYMLINK}"

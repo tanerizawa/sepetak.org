@@ -41,7 +41,7 @@ class ArticleTopicResource extends Resource
                     ->options([
                         'pillar' => 'Pilar (akademik panjang)',
                         'member_guide' => 'Panduan Anggota (praktis)',
-                        'news' => 'Berita',
+                        'news' => 'Organisasi / isu (bukan liputan harian)',
                         'opinion' => 'Opini',
                     ])
                     ->default('pillar')
@@ -62,7 +62,16 @@ class ArticleTopicResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')->label('Judul')->searchable()->wrap(),
-                Tables\Columns\TextColumn::make('article_type')->label('Jenis')->badge(),
+                Tables\Columns\TextColumn::make('article_type')
+                    ->label('Jenis')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'pillar' => 'Pilar',
+                        'member_guide' => 'Panduan Anggota',
+                        'news' => 'Organisasi / isu',
+                        'opinion' => 'Opini',
+                        default => $state ?? '-',
+                    })
+                    ->badge(),
                 Tables\Columns\TextColumn::make('weight')->label('Bobot')->sortable(),
                 Tables\Columns\TextColumn::make('times_used')->label('Terpakai')->sortable(),
                 Tables\Columns\TextColumn::make('max_uses')->label('Maks')->toggleable(),
@@ -73,7 +82,7 @@ class ArticleTopicResource extends Resource
                 Tables\Filters\SelectFilter::make('article_type')->options([
                     'pillar' => 'Pilar',
                     'member_guide' => 'Panduan Anggota',
-                    'news' => 'Berita',
+                    'news' => 'Organisasi / isu',
                     'opinion' => 'Opini',
                 ]),
             ])

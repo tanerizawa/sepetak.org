@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
+use Database\Seeders\KontakPageContent;
+use Illuminate\View\View;
 
 class ContactController extends Controller
 {
-    public function show(): RedirectResponse
+    /**
+     * Halaman kontak publik kanonik di /kontak (bukan CMS Page; isi naskah dari KontakPageContent).
+     */
+    public function show(): View
     {
-        return redirect()->route('pages.show', ['slug' => 'kontak'], 301);
+        return view('contact.show', [
+            'detailBody' => KontakPageContent::body(),
+        ]);
     }
 }

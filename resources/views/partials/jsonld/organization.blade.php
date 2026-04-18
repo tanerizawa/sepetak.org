@@ -1,5 +1,5 @@
 @php
-    $siteName        = \App\Models\SiteSetting::getValue('site_name', 'SEPETAK - Serikat Pekerja Tani Karawang');
+    $siteName        = \App\Models\SiteSetting::getValue('site_name', 'SEPETAK (Serikat Pekerja Tani Karawang)');
     $siteDescription = \App\Models\SiteSetting::getValue('site_description', 'SEPETAK adalah organisasi massa pekerja tani dan nelayan di Kabupaten Karawang, Jawa Barat.');
     $siteTagline     = \App\Models\SiteSetting::getValue('site_tagline', 'Rebut Kedaulatan Agraria, Bangun Industrialisasi Pertanian');
     $contactEmail    = \App\Models\SiteSetting::getValue('contact_email', 'info@sepetak.org');
@@ -19,7 +19,7 @@
         'url'             => url('/'),
         'logo'            => [
             '@type' => 'ImageObject',
-            'url'   => url('/favicon.ico'),
+            'url'   => asset('img/logo/logo-256.png').'?v='.urlencode((string) config('sepetak.logo_asset_version', '3')),
         ],
         'description'     => $siteDescription,
         'slogan'          => $siteTagline,

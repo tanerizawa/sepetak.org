@@ -136,7 +136,7 @@
             {{-- Alamat --}}
             <fieldset>
                 <legend class="font-display text-2xl uppercase tracking-wider border-b-4 border-flag-500 pb-2 mb-1">03 — Alamat Tempat Tinggal</legend>
-                <p class="meta-stamp mb-6 mt-2 text-ink-700">Sebutkan lokasi Anda agar kami mengelompokkan anggota per ranting.</p>
+                <p class="meta-stamp mb-6 mt-2 text-ink-700">Sebutkan lokasi Anda agar kami mengelompokkan anggota per basis.</p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div class="sm:col-span-2 field-rev">

@@ -4,7 +4,7 @@
         <title>{{ \App\Models\SiteSetting::getValue('site_name', 'SEPETAK') }}</title>
         <link>{{ url('/') }}</link>
         <atom:link href="{{ url('/feed.xml') }}" rel="self" type="application/rss+xml" />
-        <description>{{ \App\Models\SiteSetting::getValue('site_description', 'Berita dan advokasi SEPETAK') }}</description>
+        <description>{{ \App\Models\SiteSetting::getValue('site_description', 'Artikel dan publikasi SEPETAK (Serikat Pekerja Tani Karawang).') }}</description>
         <language>id</language>
         <lastBuildDate>{{ now()->toRssString() }}</lastBuildDate>
 @foreach($posts as $post)
