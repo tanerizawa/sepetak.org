@@ -17,12 +17,6 @@ class EditUser extends EditRecord
         ];
     }
 
-    protected function afterSave(): void
-    {
-        $roles = $this->data['roles'] ?? [];
-        $this->record->syncRoles($roles);
-    }
-
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

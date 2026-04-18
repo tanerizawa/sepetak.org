@@ -63,7 +63,7 @@ class AdvocacyProgramResource extends Resource
                 Tables\Columns\BadgeColumn::make('status')->label('Status')->colors([
                     'warning' => 'planning',
                     'success' => 'active',
-                    'secondary' => 'paused',
+                    'gray' => 'paused',
                     'gray' => 'completed',
                 ]),
                 Tables\Columns\TextColumn::make('start_date')->label('Mulai')->date()->sortable(),

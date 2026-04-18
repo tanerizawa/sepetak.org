@@ -85,7 +85,7 @@ class MemberResource extends Resource
                     ->colors([
                         'warning' => 'pending',
                         'success' => 'active',
-                        'secondary' => 'inactive',
+                        'gray' => 'inactive',
                         'danger' => 'rejected',
                     ]),
                 Tables\Columns\TextColumn::make('joined_at')->label('Bergabung')->date()->sortable()->toggleable(),

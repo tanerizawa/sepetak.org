@@ -36,12 +36,11 @@ class EventResource extends Resource
                 Forms\Components\Select::make('status')
                     ->label('Status')
                     ->options([
-                        'scheduled' => 'Terjadwal',
-                        'ongoing' => 'Berlangsung',
-                        'completed' => 'Selesai',
-                        'cancelled' => 'Dibatalkan',
+                        'planned' => 'Terjadwal',
+                        'done' => 'Selesai',
+                        'canceled' => 'Dibatalkan',
                     ])
-                    ->default('scheduled')
+                    ->default('planned')
                     ->required(),
                 Forms\Components\Select::make('organizer_id')
                     ->label('Penyelenggara')
@@ -68,19 +67,21 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('title')->label('Judul')->searchable()->wrap(),
                 Tables\Columns\TextColumn::make('event_date')->label('Waktu')->dateTime()->sortable(),
                 Tables\Columns\TextColumn::make('location_text')->label('Lokasi')->toggleable(),
-                Tables\Columns\BadgeColumn::make('status')->label('Status')->colors([
-                    'warning' => 'scheduled',
-                    'success' => 'ongoing',
-                    'gray' => 'completed',
-                    'danger' => 'cancelled',
-                ]),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'planned' => 'warning',
+                        'done' => 'gray',
+                        'canceled' => 'danger',
+                        default => 'gray',
+                    }),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')->options([
-                    'scheduled' => 'Terjadwal',
-                    'ongoing' => 'Berlangsung',
-                    'completed' => 'Selesai',
-                    'cancelled' => 'Dibatalkan',
+                    'planned' => 'Terjadwal',
+                    'done' => 'Selesai',
+                    'canceled' => 'Dibatalkan',
                 ]),
             ])
             ->actions([

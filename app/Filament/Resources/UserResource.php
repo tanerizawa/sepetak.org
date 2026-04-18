@@ -62,18 +62,11 @@ class UserResource extends Resource
                     // EditUser / afterCreate() di CreateUser.
                     Forms\Components\Select::make('roles')
                         ->label('Role')
+                        ->relationship('roles', 'name')
                         ->multiple()
-                        ->options(fn () => Role::pluck('name', 'name'))
                         ->preload()
                         ->required()
-                        ->default([])
-                        ->helperText('Tanpa role, pengguna tidak dapat mengakses panel.')
-                        ->dehydrated(false)
-                        ->afterStateHydrated(function (Forms\Components\Select $component, ?User $record) {
-                            if ($record) {
-                                $component->state($record->roles->pluck('name')->toArray());
-                            }
-                        }),
+                        ->helperText('Tanpa role, pengguna tidak dapat mengakses panel.'),
                 ])
                 ->columns(2),
         ]);

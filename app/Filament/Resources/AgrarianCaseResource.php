@@ -73,10 +73,10 @@ class AgrarianCaseResource extends Resource
                     'primary' => 'in_progress',
                     'info' => 'mediation',
                     'success' => 'closed',
-                    'secondary' => 'archived',
+                    'gray' => 'archived',
                 ]),
                 Tables\Columns\BadgeColumn::make('priority')->label('Prioritas')->colors([
-                    'secondary' => 'low',
+                    'gray' => 'low',
                     'warning' => 'medium',
                     'danger' => 'high',
                     'gray' => 'urgent',
