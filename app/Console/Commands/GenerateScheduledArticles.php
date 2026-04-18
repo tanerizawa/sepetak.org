@@ -104,7 +104,7 @@ class GenerateScheduledArticles extends Command
                 if ($post) {
                     $this->info("  ✓ Created post #{$post->id}: {$post->title}");
                 } else {
-                    $this->error('  ✗ Generation failed. Check logs.');
+                    $this->error($this->syncGenerationFailureMessage($pool, $topic));
                 }
             } else {
                 GenerateArticleJob::dispatch($topic, $pool, 'scheduler');
@@ -136,7 +136,7 @@ class GenerateScheduledArticles extends Command
             if ($post) {
                 $this->info("✓ Created post #{$post->id}: {$post->title}");
             } else {
-                $this->error('✗ Generation failed. Check logs.');
+                $this->error($this->syncGenerationFailureMessage(null, $topic));
             }
         } else {
             GenerateArticleJob::dispatch($topic, null, 'manual');
@@ -144,5 +144,27 @@ class GenerateScheduledArticles extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Ambil `error_message` dari log penolakan/gagal terbaru agar CLI & Filament tidak buta.
+     */
+    private function syncGenerationFailureMessage(?ArticlePool $pool, ArticleTopic $topic): string
+    {
+        $q = ArticleGenerationLog::query()
+            ->where('article_topic_id', $topic->getKey())
+            ->whereIn('status', ['rejected', 'failed']);
+
+        if ($pool !== null) {
+            $q->where('article_pool_id', $pool->getKey());
+        }
+
+        $detail = $q->orderByDesc('id')->value('error_message');
+
+        if (is_string($detail) && $detail !== '') {
+            return '  ✗ '.$detail;
+        }
+
+        return '  ✗ Generation failed. Check logs.';
     }
 }

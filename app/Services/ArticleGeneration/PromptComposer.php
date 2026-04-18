@@ -3,10 +3,12 @@
 namespace App\Services\ArticleGeneration;
 
 use App\Models\ArticlePool;
+use App\Models\ArticleTopic;
 use App\Services\ArticleGeneration\Contracts\PromptStrategyInterface;
 
 /**
- * Memilih strategi prompt berdasarkan profil pool — tanpa if/else panjang di satu kelas.
+ * Memilih strategi prompt berdasarkan profil konten (pool + topik), selaras dengan
+ * {@see ContentProfile::forArticleGeneration} dan validator.
  */
 final class PromptComposer
 {
@@ -15,24 +17,30 @@ final class PromptComposer
         private readonly MemberPracticalPromptStrategy $memberPractical,
     ) {}
 
-    public function resolve(?ArticlePool $pool): PromptStrategyInterface
+    public function resolve(?ArticlePool $pool, ?ArticleTopic $topic = null): PromptStrategyInterface
     {
+        if ($topic !== null) {
+            return ContentProfile::forArticleGeneration($pool, $topic) === ContentProfile::MemberPractical
+                ? $this->memberPractical
+                : $this->academic;
+        }
+
         return ContentProfile::fromPool($pool) === ContentProfile::MemberPractical
             ? $this->memberPractical
             : $this->academic;
     }
 
-    public function systemPrompt(?ArticlePool $pool): string
+    public function systemPrompt(?ArticlePool $pool, ?ArticleTopic $topic = null): string
     {
-        return $this->resolve($pool)->systemPrompt();
+        return $this->resolve($pool, $topic)->systemPrompt();
     }
 
     /**
      * @param  list<string>  $recentAutoPostTitles
      */
-    public function buildUserPrompt(?ArticlePool $pool, \App\Models\ArticleTopic $topic, array $recentAutoPostTitles = []): string
+    public function buildUserPrompt(?ArticlePool $pool, ArticleTopic $topic, array $recentAutoPostTitles = []): string
     {
-        $strategy = $this->resolve($pool);
+        $strategy = $this->resolve($pool, $topic);
 
         if ($strategy instanceof MemberPracticalPromptStrategy) {
             return $strategy->buildUserPrompt($topic, $recentAutoPostTitles);

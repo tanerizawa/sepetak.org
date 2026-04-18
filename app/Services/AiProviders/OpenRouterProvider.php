@@ -4,6 +4,7 @@ namespace App\Services\AiProviders;
 
 use App\Contracts\ArticleAiProvider;
 use App\DTOs\ArticleAiResponse;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -17,20 +18,23 @@ class OpenRouterProvider implements ArticleAiProvider
         protected float $temperature,
         protected string $siteUrl,
         protected string $siteName,
+        protected ?string $fallbackModel = null,
     ) {}
 
     public static function fromConfig(): static
     {
         $cfg = config('article-generator.openrouter');
+        $fallback = trim((string) ($cfg['fallback_model'] ?? ''));
 
         return new static(
             apiKey: $cfg['api_key'] ?? '',
-            baseUrl: $cfg['base_url'],
-            model: $cfg['model'],
-            maxTokens: $cfg['max_tokens'],
-            temperature: $cfg['temperature'],
-            siteUrl: $cfg['site_url'],
-            siteName: $cfg['site_name'],
+            baseUrl: (string) ($cfg['base_url'] ?? 'https://openrouter.ai/api/v1'),
+            model: (string) ($cfg['model'] ?? 'anthropic/claude-3.7-sonnet'),
+            maxTokens: (int) ($cfg['max_tokens'] ?? 8000),
+            temperature: (float) ($cfg['temperature'] ?? 0.7),
+            siteUrl: (string) ($cfg['site_url'] ?? $cfg['referer'] ?? ''),
+            siteName: (string) ($cfg['site_name'] ?? $cfg['app_title'] ?? ''),
+            fallbackModel: $fallback !== '' ? $fallback : null,
         );
     }
 
@@ -40,26 +44,20 @@ class OpenRouterProvider implements ArticleAiProvider
             throw new RuntimeException('OpenRouter API key is not configured.');
         }
 
-        $model = $options['model'] ?? $this->model;
-        $maxTokens = $options['max_tokens'] ?? $this->maxTokens;
-        $temperature = $options['temperature'] ?? $this->temperature;
+        $model = (string) ($options['model'] ?? $this->model);
+        $maxTokens = (int) ($options['max_tokens'] ?? $this->maxTokens);
+        $temperature = (float) ($options['temperature'] ?? $this->temperature);
 
-        $response = Http::timeout(180)
-            ->withHeaders([
-                'Authorization' => 'Bearer '.$this->apiKey,
-                'HTTP-Referer' => $this->siteUrl,
-                'X-Title' => $this->siteName,
-                'Content-Type' => 'application/json',
-            ])
-            ->post($this->baseUrl.'/chat/completions', [
-                'model' => $model,
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $userPrompt],
-                ],
-                'max_tokens' => $maxTokens,
-                'temperature' => $temperature,
-            ]);
+        $response = $this->chatCompletion($model, $systemPrompt, $userPrompt, $maxTokens, $temperature);
+
+        if ($response->failed()) {
+            $error = $response->json('error.message', $response->body());
+            $fallback = $this->effectiveFallbackModel($model);
+            if ($fallback !== null && $this->isNoEndpointsFoundError($error)) {
+                $response = $this->chatCompletion($fallback, $systemPrompt, $userPrompt, $maxTokens, $temperature);
+                $model = $fallback;
+            }
+        }
 
         if ($response->failed()) {
             $error = $response->json('error.message', $response->body());
@@ -89,5 +87,44 @@ class OpenRouterProvider implements ArticleAiProvider
     public function name(): string
     {
         return 'openrouter';
+    }
+
+    private function chatCompletion(
+        string $model,
+        string $systemPrompt,
+        string $userPrompt,
+        int $maxTokens,
+        float $temperature,
+    ): Response {
+        return Http::timeout(180)
+            ->withHeaders([
+                'Authorization' => 'Bearer '.$this->apiKey,
+                'HTTP-Referer' => $this->siteUrl,
+                'X-Title' => $this->siteName,
+                'Content-Type' => 'application/json',
+            ])
+            ->post($this->baseUrl.'/chat/completions', [
+                'model' => $model,
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => $userPrompt],
+                ],
+                'max_tokens' => $maxTokens,
+                'temperature' => $temperature,
+            ]);
+    }
+
+    private function effectiveFallbackModel(string $primaryModel): ?string
+    {
+        if ($this->fallbackModel === null || $this->fallbackModel === '') {
+            return null;
+        }
+
+        return $this->fallbackModel !== $primaryModel ? $this->fallbackModel : null;
+    }
+
+    private function isNoEndpointsFoundError(string $message): bool
+    {
+        return str_contains(strtolower($message), 'no endpoints found');
     }
 }

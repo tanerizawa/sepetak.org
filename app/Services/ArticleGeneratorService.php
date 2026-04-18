@@ -14,6 +14,7 @@ use App\Support\PostSlug;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use League\CommonMark\CommonMarkConverter;
 use Mews\Purifier\Facades\Purifier;
 
 /**
@@ -45,7 +46,7 @@ class ArticleGeneratorService
             ? $this->recentAutoPostTitles()
             : [];
 
-        $systemPrompt = $this->composer->systemPrompt($pool);
+        $systemPrompt = $this->composer->systemPrompt($pool, $topic);
         $userPrompt = $this->composer->buildUserPrompt($pool, $topic, $recentTitles);
 
         $log = ArticleGenerationLog::query()->create([
@@ -126,7 +127,7 @@ class ArticleGeneratorService
         ArticleGenerationLog $log,
         ContentProfile $profile,
     ): Post {
-        return DB::transaction(function () use ($content, $topic, $pool, $log, $profile): Post {
+        return DB::transaction(function () use ($content, $topic, $log, $profile): Post {
             $title = $this->parser->parseTitle($content) ?: $topic->title;
             $slug = PostSlug::uniqueFromTitle($title);
 
@@ -163,8 +164,8 @@ class ArticleGeneratorService
 
     protected function markdownToHtml(string $markdown): string
     {
-        if (class_exists(\League\CommonMark\CommonMarkConverter::class)) {
-            return (new \League\CommonMark\CommonMarkConverter(['html_input' => 'strip']))->convert($markdown)->getContent();
+        if (class_exists(CommonMarkConverter::class)) {
+            return (new CommonMarkConverter(['html_input' => 'strip']))->convert($markdown)->getContent();
         }
 
         // Minimal fallback — Filament RichEditor is HTML-first anyway.

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Support\PostSlug;
+use Illuminate\Support\Str;
 
 /**
  * Parse hasil AI (Markdown) menjadi potongan terstruktur:
@@ -21,8 +22,8 @@ class ResponseParser
 
     public function parseAbstract(string $content): string
     {
-        // Match either "## Abstrak" or "## Ringkasan praktis"/"## Ringkasan".
-        if (preg_match('/##\s*(?:Abstrak|Ringkasan(?:\s+praktis)?)\s*\n+(.+?)(?=\n##\s|\z)/is', $content, $m)) {
+        // "## Abstrak" atau "## Ringkasan …" (praktis, singkat, dsb.).
+        if (preg_match('/##\s*(?:Abstrak|Ringkasan(?:\s+[^\n#]+)?)\s*\n+(.+?)(?=\n##\s|\z)/is', $content, $m)) {
             return trim($m[1]);
         }
 
@@ -49,7 +50,7 @@ class ResponseParser
 
     public function parseReferences(string $content): array
     {
-        if (! preg_match('/##\s*Daftar\s+Pustaka\s*\n+(.+?)(?=\n##\s|\z)/is', $content, $m)) {
+        if (! preg_match('/##\s*(?:Daftar\s+Pustaka|Referensi|Daftar\s+Referensi)\s*\n+(.+?)(?=\n##\s|\z)/is', $content, $m)) {
             return [];
         }
 
@@ -76,13 +77,16 @@ class ResponseParser
 
     public function countInlineCitations(string $content): int
     {
-        // Matches APA-style inline citations: (Penulis, 2020) or (Penulis & Penulis, 2020)
-        return (int) preg_match_all('/\([A-ZÀ-ÿ][^\(\)\n]{0,120},\s*(?:\d{4}[a-z]?|n\.d\.)\)/u', $content);
+        // APA ringkas: (Penulis, 2020); awal nama boleh huruf kecil / Unicode (mis. lembaga "kemenkumham").
+        return (int) preg_match_all(
+            '/\(\s*\p{L}[^\(\)\n]{0,180},\s*(?:(?:19|20)\d{2}[a-z]?|n\.d\.)\s*\)/u',
+            $content,
+        );
     }
 
     public function hasReferencesSection(string $content): bool
     {
-        return (bool) preg_match('/##\s*(Daftar\s+Pustaka|Referensi)\b/i', $content);
+        return (bool) preg_match('/##\s*(Daftar\s+Pustaka|Daftar\s+Referensi|Referensi|Pustaka)\b/i', $content);
     }
 
     public function hasTableOfContents(string $content): bool
@@ -97,12 +101,15 @@ class ResponseParser
 
     public function hasAbstract(string $content): bool
     {
-        return (bool) preg_match('/##\s*(Abstrak|Ringkasan(\s+praktis)?)/i', $content);
+        return (bool) preg_match('/##\s*(Abstrak|Ringkasan(?:\s+[^\n#]+)?)/i', $content);
     }
 
     public function hasConclusion(string $content): bool
     {
-        return (bool) preg_match('/##\s*(Kesimpulan|Penutup)\b/i', $content);
+        return (bool) preg_match(
+            '/##\s*(Kesimpulan|Penutup|Simpulan|Penutupan|Catatan\s+akhir|Tutup)\b/i',
+            $content,
+        );
     }
 
     /**
@@ -119,7 +126,7 @@ class ResponseParser
                 $out[] = [
                     'level' => strlen($m[1]),
                     'text' => $text,
-                    'slug' => \Illuminate\Support\Str::slug($text),
+                    'slug' => Str::slug($text),
                 ];
             }
         }

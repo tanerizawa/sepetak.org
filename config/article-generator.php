@@ -18,7 +18,10 @@ return [
     'openrouter' => [
         'base_url' => env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),
         'api_key' => env('OPENROUTER_API_KEY'),
-        'model' => env('OPENROUTER_MODEL', 'anthropic/claude-3.5-sonnet'),
+        // Slug utama; alias lama seperti anthropic/claude-3.5-sonnet sering "No endpoints found" di OpenRouter.
+        'model' => env('OPENROUTER_MODEL', 'anthropic/claude-3.7-sonnet'),
+        // Satu percobaan ulang otomatis bila pesan error mengandung "no endpoints found" (routing / kebijakan data).
+        'fallback_model' => env('OPENROUTER_FALLBACK_MODEL', 'google/gemini-2.0-flash-001'),
         'temperature' => (float) env('OPENROUTER_TEMPERATURE', 0.7),
         'max_tokens' => (int) env('OPENROUTER_MAX_TOKENS', 8000),
         'referer' => env('APP_URL', 'https://sepetak.org'),
@@ -85,7 +88,7 @@ return [
             'min_inline_citations' => 5,
         ],
         'member_practical' => [
-            'min_word_count' => 450,
+            'min_word_count' => 420,
             'min_references' => 2,
             'min_inline_citations' => 2,
         ],
@@ -128,4 +131,25 @@ return [
         '18:05',
         '19:25',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Batas global (perintah `articles:generate`)
+    |--------------------------------------------------------------------------
+    */
+    'limits' => [
+        'max_per_day' => (int) env('ARTICLE_MAX_PER_DAY', 5),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cooldown topik (opsional, lintas pool)
+    |--------------------------------------------------------------------------
+    |
+    | Jika > 0, topik yang baru saja selesai digenerate (status completed pada
+    | article_generation_logs) tidak diundi lagi selama N jam. Membantu variasi
+    | judul antar pool. 0 = nonaktif (perilaku lama).
+    |
+    */
+    'topic_cooldown_hours' => (int) env('ARTICLE_TOPIC_COOLDOWN_HOURS', 0),
 ];
