@@ -15,6 +15,8 @@ class ArticlePool extends Model
         'schedule_frequency',
         'schedule_day',
         'schedule_time',
+        'schedule_times',
+        'content_profile',
         'articles_per_run',
         'is_active',
         'auto_publish',
@@ -23,6 +25,7 @@ class ArticlePool extends Model
     protected function casts(): array
     {
         return [
+            'schedule_times' => 'array',
             'articles_per_run' => 'integer',
             'is_active' => 'boolean',
             'auto_publish' => 'boolean',
