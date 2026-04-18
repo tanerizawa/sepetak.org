@@ -44,6 +44,10 @@ Route::get('/robots.txt', [FeedController::class, 'robots'])->name('robots');
 
 Route::get('/health', HealthController::class)->name('health');
 
+Route::redirect('/login', '/admin/login')->name('login');
+Route::redirect('/masuk', '/admin/login');
+Route::redirect('/admin/logout', '/admin');
+
 Route::middleware(['auth'])->group(function (): void {
     Route::get('/admin/anggota/{member}/kartu-kta', [MemberCardController::class, 'show'])
         ->name('admin.members.card');
