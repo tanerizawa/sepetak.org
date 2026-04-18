@@ -12,6 +12,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberRegistrationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('beranda');
@@ -48,6 +49,23 @@ Route::get('/health', HealthController::class)->name('health');
 Route::redirect('/login', '/admin/login')->name('login');
 Route::redirect('/masuk', '/admin/login');
 Route::redirect('/admin/logout', '/admin');
+
+// Filament authentication POST fallback
+// Normally Livewire handles this, but we provide a fallback for:
+// - JavaScript disabled
+// - Direct form posts
+// - API/bot login attempts
+Route::post('/admin/login', function (Request $request) {
+    // Attempt authentication if credentials provided
+    if ($request->has('email') && $request->has('password')) {
+        $credentials = $request->only('email', 'password');
+        if (auth()->attempt($credentials, $request->boolean('remember'))) {
+            return redirect('/admin');
+        }
+    }
+    // Fallback: redirect back to login page
+    return redirect('/admin/login');
+})->name('admin.login.post');
 
 Route::middleware(['auth'])->group(function (): void {
     Route::get('/admin/anggota/{member}/kartu-kta', [MemberCardController::class, 'show'])
