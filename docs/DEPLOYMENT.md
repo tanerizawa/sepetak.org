@@ -24,6 +24,13 @@
 - `shared/storage` dan `current/bootstrap/cache` writable oleh `www-data`
 - Anggota grup: `usermod -aG deploy www-data`
 
+## Artisan di server (cache / view)
+
+Jangan menjalankan `php artisan …` sebagai **root** pada direktori produksi: file di `storage/framework/views` dan `bootstrap/cache` akan dimiliki root sehingga PHP-FPM (`www-data`) gagal menulis (HTTP 500, *Permission denied*).
+
+- **Manual / SSH:** dari root aplikasi, gunakan `bash scripts/artisan-web.sh <perintah>` (set `APP_ROOT` jika perlu). Skrip ini menjalankan artisan sebagai `WEB_USER` (default `www-data`) lewat `sudo` atau `runuser`.
+- **Deploy otomatis:** `scripts/deploy.sh` memanggil semua langkah artisan sebagai `WEB_USER` yang sama; tidak ada fallback ke root.
+
 ## Langkah Setup Dasar
 
 1. Update server dan install dependency sistem

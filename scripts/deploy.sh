@@ -20,9 +20,10 @@
 #   NPM_BIN        (default: npm)
 #   SKIP_NPM       (default: 0) set ke 1 jika build asset dilakukan di CI
 #   SKIP_MIGRATE   (default: 0) set ke 1 jika migrasi dijalankan manual
-#   WEB_USER       (default: www-data) — pemilik storage/bootstrap; artisan
-#                  view:cache di bawah dijalankan sebagai user ini jika sudo -n ada,
-#                  supaya view terkompilasi bukan milik root (hindari Permission denied).
+#   WEB_USER       (default: www-data) — semua `php artisan` di script ini dijalankan
+#                  sebagai user ini bila deploy sebagai root (perlu sudo NOPASSWD ke WEB_USER).
+#                  Tanpa itu, deploy akan berhenti (tidak fallback ke root) agar view/cache
+#                  tidak dimiliki root → Permission denied di PHP-FPM.
 #
 # Asumsi:
 #   - Script dijalankan oleh user yang bisa tulis ke ${APP_ROOT}/releases dan
@@ -81,11 +82,39 @@ log "3. Link shared storage → release"
 rm -rf "${NEW_RELEASE}/storage"
 ln -sfn "${SHARED_DIR}/storage" "${NEW_RELEASE}/storage"
 
+# Jalankan artisan sebagai WEB_USER bila deploy root + sudo ke WEB_USER ada.
+# Jangan fallback ke root: view:cache milik root memicu Permission denied di FPM.
+run_artisan_web() {
+  local web_uid
+  web_uid="$(id -u "${WEB_USER}" 2>/dev/null || true)"
+  if [[ -n "${web_uid}" && "$(id -u)" -eq "${web_uid}" ]]; then
+    ${PHP_BIN} "${NEW_RELEASE}/artisan" "$@"
+    return
+  fi
+  if sudo -n -u "${WEB_USER}" true 2>/dev/null; then
+    sudo -n -u "${WEB_USER}" -- ${PHP_BIN} "${NEW_RELEASE}/artisan" "$@"
+    return
+  fi
+  if [[ "$(id -u)" -eq 0 ]] && command -v runuser >/dev/null 2>&1; then
+    runuser -u "${WEB_USER}" -- ${PHP_BIN} "${NEW_RELEASE}/artisan" "$@"
+    return
+  fi
+  if [[ "$(id -u)" -eq 0 ]]; then
+    die "Artisan tidak boleh dijalankan sebagai root sebagai user biasa (tanpa sudo/runuser ke ${WEB_USER}).
+Pasang sudo atau util-linux (runuser), atau jalankan:
+  runuser -u ${WEB_USER} -- ${PHP_BIN} \"${NEW_RELEASE}/artisan\" ...
+Untuk user deploy non-root, tambahkan NOPASSWD, mis. /etc/sudoers.d/sepetak-deploy:
+  deploy ALL=(${WEB_USER}) NOPASSWD:SETENV: ${PHP_BIN}
+Perintah: artisan $*"
+  fi
+  ${PHP_BIN} "${NEW_RELEASE}/artisan" "$@"
+}
+
 log "4. composer install --no-dev --optimize-autoloader"
 ( cd "${NEW_RELEASE}" && ${COMPOSER_BIN} install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader )
 
 log "4b. Livewire front-end → public/vendor/livewire (hindari 404 jika /livewire/* tidak ke PHP)"
-( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan livewire:publish --assets --no-interaction ) || true
+run_artisan_web livewire:publish --assets --no-interaction || true
 
 if [[ "${SKIP_NPM}" != "1" ]]; then
   log "5. npm ci && npm run build"
@@ -95,11 +124,11 @@ else
 fi
 
 log "6. php artisan storage:link"
-( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan storage:link --force --quiet ) || true
+run_artisan_web storage:link --force --quiet || true
 
 if [[ "${SKIP_MIGRATE}" != "1" ]]; then
   log "7. php artisan migrate --force"
-  ( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan migrate --force )
+  run_artisan_web migrate --force
 else
   log "7. SKIP_MIGRATE=1 — melewati migrasi."
 fi
@@ -117,19 +146,10 @@ if [[ "$(id -u)" -eq 0 ]] || sudo -n true 2>/dev/null; then
   fi
 fi
 
-run_artisan_cache() {
-  local sub="$1"
-  if sudo -n -u "${WEB_USER}" true 2>/dev/null; then
-    sudo -n -u "${WEB_USER}" -- bash -c "cd \"${NEW_RELEASE}\" && ${PHP_BIN} artisan ${sub}"
-  else
-    ( cd "${NEW_RELEASE}" && ${PHP_BIN} artisan "${sub}" )
-  fi
-}
-
-run_artisan_cache "config:cache"
-run_artisan_cache "route:cache"
-run_artisan_cache "view:cache"
-run_artisan_cache "event:cache" || true
+run_artisan_web config:cache
+run_artisan_web route:cache
+run_artisan_web view:cache
+run_artisan_web event:cache || true
 
 log "9. Ownership + permissions: shared storage + bootstrap/cache (${WEB_USER})"
 if [[ "$(id -u)" -eq 0 ]]; then
@@ -147,7 +167,7 @@ ln -sfn "${NEW_RELEASE}" "${CURRENT_SYMLINK}"
 
 log "11. Reload services (php-fpm, nginx, queue worker)"
 if command -v systemctl >/dev/null 2>&1; then
-  sudo -n systemctl reload php8.3-fpm 2>/dev/null || sudo -n systemctl reload php8.4-fpm 2>/dev/null || true
+  sudo -n systemctl reload php8.4-fpm 2>/dev/null || sudo -n systemctl reload php8.3-fpm 2>/dev/null || true
   sudo -n systemctl reload nginx 2>/dev/null || true
 fi
 if command -v supervisorctl >/dev/null 2>&1; then
