@@ -3,12 +3,17 @@
 namespace App\Services;
 
 use App\Models\Post;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ArticleImageService
 {
+    private const CIRCUIT_BREAKER_PREFIX = 'img_circuit_';
+    private const CACHE_PREFIX = 'img_search_';
+    private const CIRCUIT_THRESHOLD = 5;
+    private const CIRCUIT_RESET_SECONDS = 300;
     /**
      * Known figures → Wikimedia Commons filenames for exact matches.
      */
@@ -70,11 +75,6 @@ class ArticleImageService
      */
     public function attachCoverImage(Post $post, ?string $searchQuery = null): bool
     {
-        if (! config('article-generator.unsplash.enabled', true)) {
-            return false;
-        }
-
-        // 1. Try known figure match first (exact Wikimedia file)
         $figureImage = $this->matchKnownFigure($post);
         if ($figureImage) {
             Log::info('ArticleImageService: Matched known figure', [
@@ -91,7 +91,6 @@ class ArticleImageService
             );
         }
 
-        // 2. Build contextual queries and try providers in order
         $queries = $searchQuery
             ? [$searchQuery]
             : $this->buildSearchQueries($post);
@@ -99,7 +98,29 @@ class ArticleImageService
         $providers = $this->getOrderedProviders();
 
         foreach ($providers as [$provider, $apiKey]) {
+            if ($this->isCircuitOpen($provider)) {
+                continue;
+            }
+
             foreach ($queries as $query) {
+                $cacheKey = self::CACHE_PREFIX.md5("{$provider}:{$query}");
+                $cached = Cache::get($cacheKey);
+                if ($cached !== null) {
+                    if ($cached === 'FAILED') {
+                        continue;
+                    }
+                    Log::info('ArticleImageService: Cache hit', [
+                        'post_id' => $post->id,
+                        'provider' => $provider,
+                        'query' => $query,
+                    ]);
+                    $result = $this->downloadAndAttach($post, $cached['url'], $cached['photographer'], $cached['photographer_url'], $provider);
+                    if ($result) {
+                        return true;
+                    }
+                    continue;
+                }
+
                 try {
                     $imageData = match ($provider) {
                         'wikimedia' => $this->searchWikimedia($query),
@@ -114,16 +135,16 @@ class ArticleImageService
                             'provider' => $provider,
                             'query' => $query,
                         ]);
-
-                        return $this->downloadAndAttach(
-                            $post,
-                            $imageData['url'],
-                            $imageData['photographer'],
-                            $imageData['photographer_url'],
-                            $provider
-                        );
+                        Cache::put($cacheKey, $imageData, now()->addHours(24));
+                        $result = $this->downloadAndAttach($post, $imageData['url'], $imageData['photographer'], $imageData['photographer_url'], $provider);
+                        if ($result) {
+                            return true;
+                        }
+                    } else {
+                        Cache::put($cacheKey, 'FAILED', now()->addMinutes(30));
                     }
                 } catch (\Throwable $e) {
+                    $this->recordFailure($provider);
                     Log::warning("ArticleImageService: {$provider} failed", [
                         'post_id' => $post->id,
                         'query' => $query,
@@ -139,6 +160,19 @@ class ArticleImageService
         ]);
 
         return false;
+    }
+
+    private function isCircuitOpen(string $provider): bool
+    {
+        $key = self::CIRCUIT_BREAKER_PREFIX.$provider;
+        return (int) Cache::get($key, 0) >= self::CIRCUIT_THRESHOLD;
+    }
+
+    private function recordFailure(string $provider): void
+    {
+        $key = self::CIRCUIT_BREAKER_PREFIX.$provider;
+        $count = (int) Cache::get($key, 0) + 1;
+        Cache::put($key, $count, now()->addSeconds(self::CIRCUIT_RESET_SECONDS));
     }
 
     /**
@@ -255,19 +289,45 @@ class ArticleImageService
      */
     protected function getOrderedProviders(): array
     {
-        $providers = [];
+        $order = config('article-generator.image_provider_order', ['wikimedia', 'pexels', 'unsplash']);
+        $order = array_values(array_unique(array_map(
+            fn ($v) => mb_strtolower(trim((string) $v)),
+            is_array($order) ? $order : [$order]
+        )));
 
-        // Wikimedia Commons is always available (no API key needed)
-        $providers[] = ['wikimedia', null];
-
-        $pexels = config('article-generator.pexels.api_key');
-        if (! empty($pexels)) {
-            $providers[] = ['pexels', $pexels];
+        if (! in_array('wikimedia', $order, true)) {
+            array_unshift($order, 'wikimedia');
         }
 
-        $unsplash = config('article-generator.unsplash.api_key');
-        if (! empty($unsplash)) {
-            $providers[] = ['unsplash', $unsplash];
+        $providers = [];
+
+        foreach ($order as $provider) {
+            if ($provider === 'wikimedia') {
+                $providers[] = ['wikimedia', null];
+                continue;
+            }
+
+            if ($provider === 'pexels') {
+                if (! config('article-generator.pexels.enabled', true)) {
+                    continue;
+                }
+                $pexels = (string) config('article-generator.pexels.api_key');
+                if ($pexels !== '') {
+                    $providers[] = ['pexels', $pexels];
+                }
+                continue;
+            }
+
+            if ($provider === 'unsplash') {
+                if (! config('article-generator.unsplash.enabled', true)) {
+                    continue;
+                }
+                $unsplash = (string) config('article-generator.unsplash.access_key');
+                if ($unsplash !== '') {
+                    $providers[] = ['unsplash', $unsplash];
+                }
+                continue;
+            }
         }
 
         return $providers;
@@ -487,12 +547,13 @@ class ArticleImageService
         }
 
         $filename = 'cover-'.Str::slug($post->title).'-'.Str::random(6).'.'.$extension;
-        $tempPath = storage_path('app/temp/'.$filename);
-
-        if (! is_dir(dirname($tempPath))) {
-            mkdir(dirname($tempPath), 0775, true);
+        $tmp = tempnam(sys_get_temp_dir(), 'sepetak-cover-');
+        if ($tmp === false) {
+            return false;
         }
 
+        $tempPath = $tmp.'.'.$extension;
+        @rename($tmp, $tempPath);
         file_put_contents($tempPath, $response->body());
 
         try {

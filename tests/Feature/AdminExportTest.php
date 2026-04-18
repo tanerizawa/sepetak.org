@@ -38,6 +38,7 @@ class AdminExportTest extends TestCase
     public function test_viewer_cannot_access_members_pdf(): void
     {
         $viewer = User::factory()->create(['is_active' => true]);
+        assert($viewer instanceof User);
         $viewer->syncRoles(['viewer']);
 
         $this->actingAs($viewer)
@@ -48,6 +49,7 @@ class AdminExportTest extends TestCase
     public function test_admin_can_download_members_pdf(): void
     {
         $admin = User::factory()->create(['is_active' => true]);
+        assert($admin instanceof User);
         $admin->syncRoles(['admin']);
 
         Member::create([
@@ -67,10 +69,15 @@ class AdminExportTest extends TestCase
     public function test_admin_can_download_agrarian_cases_pdf(): void
     {
         $admin = User::factory()->create(['is_active' => true]);
+        assert($admin instanceof User);
         $admin->syncRoles(['admin']);
 
         AgrarianCase::create([
+            'case_code' => 'CASE-PDF-1',
             'title'  => 'Kasus Uji',
+            'summary' => 'Ringkasan',
+            'description' => 'Deskripsi',
+            'start_date' => now()->toDateString(),
             'status' => 'reported',
             'priority' => 'medium',
         ]);

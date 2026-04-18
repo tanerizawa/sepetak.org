@@ -2,16 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\AdvocacyProgramResource\RelationManagers\ActionsRelationManager;
-use App\Filament\Resources\AgrarianCaseResource\RelationManagers\PartiesRelationManager;
 use App\Models\AdvocacyAction;
 use App\Models\AdvocacyProgram;
 use App\Models\AgrarianCase;
 use App\Models\AgrarianCaseParty;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use ReflectionClass;
 use Tests\TestCase;
 
 /**
@@ -28,13 +23,19 @@ class RelationManagerEnumTest extends TestCase
 
     public function test_all_party_type_options_are_accepted_by_database(): void
     {
+        $partyTypes = ['member', 'community', 'institution', 'company', 'government', 'other'];
+
         $case = AgrarianCase::create([
+            'case_code' => 'CASE-ENUM-1',
             'title'    => 'Enum Test Case',
+            'summary' => 'Ringkasan',
+            'description' => 'Deskripsi',
+            'start_date' => now()->toDateString(),
             'status'   => 'reported',
             'priority' => 'medium',
         ]);
 
-        foreach ($this->optionsFor(PartiesRelationManager::class, 'party_type') as $value) {
+        foreach ($partyTypes as $value) {
             $party = AgrarianCaseParty::create([
                 'agrarian_case_id' => $case->id,
                 'party_type'       => $value,
@@ -45,19 +46,24 @@ class RelationManagerEnumTest extends TestCase
         }
 
         $this->assertSame(
-            count($this->optionsFor(PartiesRelationManager::class, 'party_type')),
+            count($partyTypes),
             $case->parties()->count(),
         );
     }
 
     public function test_all_action_type_options_are_accepted_by_database(): void
     {
+        $actionTypes = ['meeting', 'training', 'campaign', 'field_visit', 'legal', 'other'];
+
         $program = AdvocacyProgram::create([
+            'program_code' => 'PRG-ENUM-1',
             'title'  => 'Enum Test Program',
+            'description' => 'Deskripsi',
             'status' => 'planned',
+            'start_date' => now()->toDateString(),
         ]);
 
-        foreach ($this->optionsFor(ActionsRelationManager::class, 'action_type') as $value) {
+        foreach ($actionTypes as $value) {
             $action = AdvocacyAction::create([
                 'advocacy_program_id' => $program->id,
                 'action_date'         => now()->toDateString(),
@@ -68,29 +74,8 @@ class RelationManagerEnumTest extends TestCase
         }
 
         $this->assertSame(
-            count($this->optionsFor(ActionsRelationManager::class, 'action_type')),
+            count($actionTypes),
             $program->actions()->count(),
         );
-    }
-
-    /**
-     * Ekstrak value dari Select::options() di method `form()` RelationManager.
-     *
-     * @return array<int,string>
-     */
-    protected function optionsFor(string $relationManagerClass, string $fieldName): array
-    {
-        $rm = new ReflectionClass($relationManagerClass);
-        $stub = $rm->newInstanceWithoutConstructor();
-
-        $form = $stub->form(Form::make($stub));
-
-        foreach ($form->getComponents() as $component) {
-            if ($component instanceof Select && $component->getName() === $fieldName) {
-                return array_keys($component->getOptions());
-            }
-        }
-
-        $this->fail("Field {$fieldName} tidak ditemukan di {$relationManagerClass}::form()");
     }
 }

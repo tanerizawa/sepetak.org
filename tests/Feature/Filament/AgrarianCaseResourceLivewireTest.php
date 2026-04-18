@@ -39,7 +39,11 @@ class AgrarianCaseResourceLivewireTest extends TestCase
     public function test_list_agrarian_cases_renders(): void
     {
         AgrarianCase::create([
+            'case_code' => 'CASE-LIST-1',
             'title' => 'Kasus A',
+            'summary' => 'Ringkasan',
+            'description' => 'Deskripsi',
+            'start_date' => now()->toDateString(),
             'status' => 'reported',
             'priority' => 'medium',
         ]);
@@ -54,7 +58,11 @@ class AgrarianCaseResourceLivewireTest extends TestCase
         Notification::fake();
 
         $case = AgrarianCase::create([
+            'case_code' => 'CASE-STATUS-1',
             'title' => 'Sengketa Uji Status',
+            'summary' => 'Ringkasan',
+            'description' => 'Deskripsi',
+            'start_date' => now()->toDateString(),
             'status' => 'reported',
             'priority' => 'medium',
         ]);
@@ -68,8 +76,10 @@ class AgrarianCaseResourceLivewireTest extends TestCase
     public function test_view_action_opens_infolist_without_error(): void
     {
         $case = AgrarianCase::create([
+            'case_code' => 'CASE-VIEW-1',
             'title' => 'Kasus Dilihat',
             'summary' => 'Ringkasan uji view',
+            'description' => 'Deskripsi uji view',
             'status' => 'mediation',
             'priority' => 'high',
             'start_date' => now()->toDateString(),

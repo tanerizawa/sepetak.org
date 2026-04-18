@@ -90,4 +90,19 @@ class Post extends Model implements HasMedia
     {
         return $this->articlePresentationForPublic()['html'];
     }
+
+    public function readingTimeMinutes(): int
+    {
+        $html = (string) ($this->body ?? '');
+        $text = trim(preg_replace('/\s+/u', ' ', strip_tags($html)) ?? '');
+        if ($text === '') {
+            return 1;
+        }
+
+        $words = preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $count = count($words);
+        $minutes = (int) ceil($count / 200);
+
+        return max(1, $minutes);
+    }
 }

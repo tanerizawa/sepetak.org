@@ -26,6 +26,9 @@
         <env name="APP_KEY" value="base64:2fl+Ktvkfl+Fuz4Qp/A75G2RTiWVA/ZoKZvp6fiiM10="/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
+        <env name="LOG_CHANNEL" value="null"/>
+        <env name="ARTICLE_METRICS_LOG_STACK" value="null"/>
+        <env name="VIEW_COMPILED_PATH" value="/tmp/sepetak-views"/>
         <env name="DB_CONNECTION" value="pgsql"/>
         <env name="DB_DATABASE" value="sepetak_test"/>
         <env name="MAIL_MAILER" value="array"/>

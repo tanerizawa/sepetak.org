@@ -11,26 +11,26 @@
         font-size: 0.8rem;
         text-transform: uppercase;
         letter-spacing: 0.12em;
-        color: #0D0D0D;
+        color: hsl(var(--ink-900));
     }
-    .field-rev .req { color: #C8102E; }
+    .field-rev .req { color: hsl(var(--flag-500)); }
     .input-rev {
         width: 100%;
         padding: 0.65rem 0.85rem;
-        background: #FCF9F1;
-        border: 3px solid #0D0D0D;
+        background: hsl(var(--paper-50));
+        border: 3px solid hsl(var(--ink-900));
         border-radius: 0;
-        color: #0D0D0D;
+        color: hsl(var(--ink-900));
         font-family: "Work Sans", sans-serif;
         font-size: 0.95rem;
         transition: box-shadow 120ms ease, transform 120ms ease;
     }
     .input-rev:focus {
         outline: none;
-        box-shadow: 4px 4px 0 #C8102E;
+        box-shadow: 4px 4px 0 hsl(var(--flag-500));
         transform: translate(-2px, -2px);
     }
-    select.input-rev { appearance: none; background-image: linear-gradient(45deg, transparent 50%, #0D0D0D 50%), linear-gradient(135deg, #0D0D0D 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; padding-right: 2.25rem; }
+    select.input-rev { appearance: none; background-image: linear-gradient(45deg, transparent 50%, hsl(var(--ink-900)) 50%), linear-gradient(135deg, hsl(var(--ink-900)) 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; padding-right: 2.25rem; }
     textarea.input-rev { resize: vertical; min-height: 6rem; }
 </style>
 @endpush

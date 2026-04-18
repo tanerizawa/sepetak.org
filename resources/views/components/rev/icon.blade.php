@@ -44,7 +44,7 @@
         'arrow-right' => '<path d="M4 12 H20 M14 6 L20 12 L14 18" stroke="currentColor" stroke-width="3" stroke-linecap="square" fill="none"/>',
         // Rumah tani
         'home'  => '<path d="M3 10 L12 3 L21 10 V21 H3 Z" fill="currentColor"/>
-                    <rect x="10" y="14" width="4" height="7" fill="#FCF9F1"/>',
+                    <rect x="10" y="14" width="4" height="7" fill="hsl(var(--paper-50))"/>',
     ];
     $path = $paths[$name] ?? $paths['sun'];
 @endphp

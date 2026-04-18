@@ -3,17 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdvocacyProgram;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class AdvocacyProgramPublicController extends Controller
 {
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
         $programs = AdvocacyProgram::query()
             ->orderByRaw("CASE status WHEN 'active' THEN 0 WHEN 'planned' THEN 1 WHEN 'paused' THEN 2 ELSE 3 END")
             ->orderByDesc('start_date')
             ->orderByDesc('id')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
+        if ($programs->isEmpty() && $programs->currentPage() > 1) {
+            return redirect()->to($programs->url($programs->lastPage()));
+        }
 
         return view('advocacy-programs.index', [
             'programs' => $programs,

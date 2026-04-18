@@ -48,13 +48,13 @@
             </div>
 
             @if ($cover)
-                <div class="relative border-4 border-ink-900 shadow-poster">
-                    <img src="{{ $cover }}" alt="{{ $post->title }}" class="block w-full h-auto grayscale"/>
+                <div class="relative aspect-video overflow-hidden border-4 border-ink-900 shadow-poster">
+                    <img src="{{ $cover }}" alt="{{ $post->title }}" class="block h-full w-full object-cover grayscale"/>
                     <div class="pointer-events-none absolute inset-0 bg-flag-500/25 mix-blend-multiply"></div>
                     <div class="absolute top-2 left-2 bg-ink-900 text-paper-50 px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-widest">Foto Lapangan</div>
                 </div>
             @else
-                <div class="hidden lg:flex aspect-[4/3] bg-flag-500 border-4 border-ink-900 shadow-poster items-center justify-center">
+                <div class="hidden lg:flex aspect-video bg-flag-500 border-4 border-ink-900 shadow-poster items-center justify-center">
                     <x-rev.icon name="megaphone" size="96" class="text-paper-50"/>
                 </div>
             @endif
@@ -96,7 +96,7 @@
             @endif
 
             <div class="lg:col-start-1 lg:row-start-1 order-last lg:order-none min-w-0">
-                <div class="prose-rev prose-rev--article max-w-none">
+                <div class="prose-rev prose-rev--article">
                     {!! $presentation['html'] !!}
                 </div>
 

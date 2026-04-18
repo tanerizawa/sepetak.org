@@ -148,24 +148,20 @@ class ArticlePool extends Model
         }
         $day = $nowTz->copy()->startOfDay();
 
-        $tailStart = $this->combineLocalDateTime($day->copy()->subDay(), $sortedSlots[$n - 1]);
-        $tailEnd = $this->combineLocalDateTime($day, $sortedSlots[0]);
-        if ($nowTz->greaterThanOrEqualTo($tailStart) && $nowTz->lessThan($tailEnd)) {
-            return [$tailStart, $tailEnd];
-        }
-
-        for ($i = 0; $i < $n - 1; $i++) {
-            $start = $this->combineLocalDateTime($day, $sortedSlots[$i]);
-            $end = $this->combineLocalDateTime($day, $sortedSlots[$i + 1]);
-            if ($nowTz->greaterThanOrEqualTo($start) && $nowTz->lessThan($end)) {
-                return [$start, $end];
+        if ($n === 1) {
+            $slotTime = $this->combineLocalDateTime($day, $sortedSlots[0]);
+            $windowEnd = $slotTime->copy()->addMinutes(15);
+            if ($nowTz->greaterThanOrEqualTo($slotTime) && $nowTz->lessThan($windowEnd)) {
+                return [$slotTime, $windowEnd];
             }
+            return null;
         }
 
-        $startLast = $this->combineLocalDateTime($day, $sortedSlots[$n - 1]);
-        $endLast = $this->combineLocalDateTime($day->copy()->addDay(), $sortedSlots[0]);
-        if ($nowTz->greaterThanOrEqualTo($startLast) && $nowTz->lessThan($endLast)) {
-            return [$startLast, $endLast];
+        foreach ($sortedSlots as $slot) {
+            $slotTime = $this->combineLocalDateTime($day, $slot);
+            if ($nowTz->eq($slotTime)) {
+                return [$slotTime, $slotTime->copy()->addMinutes(1)];
+            }
         }
 
         return null;

@@ -13,6 +13,7 @@ use App\Services\ArticleGeneration\PromptComposer;
 use App\Support\PostSlug;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use League\CommonMark\CommonMarkConverter;
 use Mews\Purifier\Facades\Purifier;
@@ -31,6 +32,8 @@ class ArticleGeneratorService
         protected ResponseParser $parser,
         protected ArticleQualityValidator $validator,
         protected ArticleImageService $images,
+        protected ArticleReadabilityScorer $readability,
+        protected ArticlePlagiarismChecker $plagiarism,
     ) {}
 
     /**
@@ -47,14 +50,18 @@ class ArticleGeneratorService
             : [];
 
         $systemPrompt = $this->composer->systemPrompt($pool, $topic);
-        $userPrompt = $this->composer->buildUserPrompt($pool, $topic, $recentTitles);
+        $promptMeta = $this->composer->buildUserPromptWithMeta($pool, $topic, $recentTitles);
+        $userPrompt = $promptMeta['prompt'];
+        $promptVariant = $promptMeta['variant'];
 
         $log = ArticleGenerationLog::query()->create([
             'article_topic_id' => $topic->getKey(),
             'article_pool_id' => $pool?->getKey(),
+            'content_profile' => $profile->value,
             'status' => 'generating',
             'ai_provider' => $this->provider->name(),
             'ai_model' => (string) config('article-generator.openrouter.model', ''),
+            'prompt_variant' => $promptVariant,
             'prompt_used' => $userPrompt,
             'triggered_by' => $triggeredBy,
         ]);
@@ -70,16 +77,117 @@ class ArticleGeneratorService
             ])->save();
 
             $content = $response->content;
+            $wordCount = $this->parser->countWords($content);
+            $readabilityScore = $this->readability->scoreMarkdown($content);
+
+            $log->forceFill([
+                'word_count' => $wordCount,
+                'readability_score' => $readabilityScore,
+            ])->save();
+
+            if ((bool) config('article-generator.quality.readability.enabled', true)) {
+                $minReadability = (int) config('article-generator.quality.readability.min_score', 0);
+                if ($minReadability > 0 && $readabilityScore < $minReadability) {
+                    $log->forceFill([
+                        'status' => 'rejected',
+                        'error_message' => "Readability score terlalu rendah ({$readabilityScore} < {$minReadability}).",
+                    ])->save();
+
+                    Log::warning('ArticleGenerator: content rejected by readability gate', [
+                        'topic_id' => $topic->getKey(),
+                        'readability_score' => $readabilityScore,
+                        'min_score' => $minReadability,
+                    ]);
+
+                    try {
+                        Log::channel('article_metrics')->info('generation_completed', [
+                            'status' => 'rejected',
+                            'topic_id' => $topic->getKey(),
+                            'pool_id' => $pool?->getKey(),
+                            'log_id' => $log->getKey(),
+                            'duration_ms' => $log->generation_time_ms,
+                            'tokens_used' => $log->tokens_used,
+                            'word_count' => $wordCount,
+                            'content_profile' => $profile->value,
+                            'prompt_variant' => $promptVariant,
+                            'readability_score' => $readabilityScore,
+                            'quality_passed' => false,
+                        ]);
+                    } catch (\Throwable) {
+                    }
+
+                    return null;
+                }
+            }
 
             if (! $this->validator->validate($content, $profile->value)) {
                 $log->forceFill([
                     'status' => 'rejected',
-                    'error_message' => 'Validator gagal: '.$this->validator->allIssuesAsString(),
+                    'error_message' => 'Validator gagal: ' . $this->validator->allIssuesAsString(),
                 ])->save();
                 Log::warning('ArticleGenerator: content rejected by validator', [
                     'topic_id' => $topic->getKey(),
                     'issues' => $this->validator->allIssuesAsString(),
                 ]);
+
+                try {
+                    Log::channel('article_metrics')->info('generation_completed', [
+                        'status' => 'rejected',
+                        'topic_id' => $topic->getKey(),
+                        'pool_id' => $pool?->getKey(),
+                        'log_id' => $log->getKey(),
+                        'duration_ms' => $log->generation_time_ms,
+                        'tokens_used' => $log->tokens_used,
+                        'word_count' => $wordCount,
+                        'content_profile' => $profile->value,
+                        'prompt_variant' => $promptVariant,
+                        'readability_score' => $readabilityScore,
+                        'quality_passed' => false,
+                    ]);
+                } catch (\Throwable) {
+                }
+
+                return null;
+            }
+
+            $plagiarismResult = $this->plagiarism->checkMarkdown($content);
+            $plagiarismScore = (float) $plagiarismResult->maxSimilarity;
+            $log->forceFill([
+                'plagiarism_score' => $plagiarismScore,
+                'plagiarism_matched_post_id' => $plagiarismResult->matchedPostId,
+            ])->save();
+
+            $maxSimilarity = (float) config('article-generator.quality.plagiarism.max_similarity', 0.35);
+            if ($plagiarismResult->isTooSimilar($maxSimilarity)) {
+                $matched = $plagiarismResult->matchedPostId ? " (post_id={$plagiarismResult->matchedPostId})" : '';
+                $log->forceFill([
+                    'status' => 'rejected',
+                    'error_message' => "Plagiarisme terdeteksi: similarity={$plagiarismScore}{$matched}.",
+                ])->save();
+
+                Log::warning('ArticleGenerator: content rejected by plagiarism gate', [
+                    'topic_id' => $topic->getKey(),
+                    'plagiarism_score' => $plagiarismScore,
+                    'matched_post_id' => $plagiarismResult->matchedPostId,
+                ]);
+
+                try {
+                    Log::channel('article_metrics')->info('generation_completed', [
+                        'status' => 'rejected',
+                        'topic_id' => $topic->getKey(),
+                        'pool_id' => $pool?->getKey(),
+                        'log_id' => $log->getKey(),
+                        'duration_ms' => $log->generation_time_ms,
+                        'tokens_used' => $log->tokens_used,
+                        'word_count' => $wordCount,
+                        'content_profile' => $profile->value,
+                        'prompt_variant' => $promptVariant,
+                        'readability_score' => $readabilityScore,
+                        'plagiarism_score' => $plagiarismScore,
+                        'quality_passed' => false,
+                    ]);
+                } catch (\Throwable) {
+                }
 
                 return null;
             }
@@ -93,11 +201,35 @@ class ArticleGeneratorService
 
             $topic->incrementUsage();
 
+            $cooldownHours = (int) config('article-generator.topic_cooldown_hours', 0);
+            if ($cooldownHours > 0) {
+                Cache::put("ai_article_topic:cooldown:{$topic->getKey()}", 1, now()->addHours($cooldownHours));
+            }
+
             if (($pool?->auto_publish ?? false) === true && $post->status !== 'published') {
                 $post->forceFill([
                     'status' => 'published',
                     'published_at' => $post->published_at ?? now(),
                 ])->save();
+            }
+
+            try {
+                Log::channel('article_metrics')->info('generation_completed', [
+                    'status' => 'completed',
+                    'topic_id' => $topic->getKey(),
+                    'pool_id' => $pool?->getKey(),
+                    'log_id' => $log->getKey(),
+                    'post_id' => $post->getKey(),
+                    'duration_ms' => $log->generation_time_ms,
+                    'tokens_used' => $log->tokens_used,
+                    'word_count' => $wordCount,
+                    'content_profile' => $profile->value,
+                    'prompt_variant' => $promptVariant,
+                    'readability_score' => $readabilityScore,
+                    'plagiarism_score' => $plagiarismScore ?? null,
+                    'quality_passed' => true,
+                ]);
+            } catch (\Throwable) {
             }
 
             return $post;
@@ -112,6 +244,19 @@ class ArticleGeneratorService
                 'topic_id' => $topic->getKey(),
                 'error' => $e->getMessage(),
             ]);
+
+            try {
+                Log::channel('article_metrics')->error('generation_failed', [
+                    'topic_id' => $topic->getKey(),
+                    'pool_id' => $pool?->getKey(),
+                    'log_id' => $log->getKey(),
+                    'duration_ms' => $log->generation_time_ms,
+                    'content_profile' => $profile->value,
+                    'prompt_variant' => $promptVariant,
+                    'error' => $e->getMessage(),
+                ]);
+            } catch (\Throwable) {
+            }
 
             throw $e;
         }

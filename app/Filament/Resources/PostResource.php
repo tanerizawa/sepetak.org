@@ -153,6 +153,24 @@ class PostResource extends Resource
                         'published' => 'Dipublikasikan',
                         'archived' => 'Diarsipkan',
                     ]),
+                Tables\Filters\SelectFilter::make('ai_pool_content_profile')
+                    ->label('Profil Pool AI')
+                    ->options([
+                        'pillar' => 'Pillar',
+                        'member_practical' => 'Materi Praktis',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+                        if (! filled($value)) {
+                            return $query;
+                        }
+
+                        return $query
+                            ->where('source_type', 'auto_generated')
+                            ->whereHas('articleTopic.pools', function (Builder $sub) use ($value): void {
+                                $sub->where('article_pools.content_profile', $value);
+                            });
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make('preview')

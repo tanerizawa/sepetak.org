@@ -9,6 +9,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DesignSystemController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberRegistrationController;
 use App\Http\Controllers\PageController;
@@ -16,9 +17,12 @@ use App\Http\Controllers\PostController;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('beranda');
+Route::get('/_home/articles', [HomeController::class, 'articles'])->middleware('throttle:60,1')->name('home.articles');
+Route::get('/design-system', DesignSystemController::class)->name('design-system');
 
 Route::permanentRedirect('/halaman/kontak', '/kontak');
 Route::get('/kontak', [ContactController::class, 'show'])->name('contact.show');
@@ -26,7 +30,7 @@ Route::get('/halaman/{slug}', [PageController::class, 'show'])->name('pages.show
 
 Route::get('/daftar-anggota', [MemberRegistrationController::class, 'create'])->name('member-registration.create');
 Route::post('/daftar-anggota', [MemberRegistrationController::class, 'store'])
-    ->middleware(\Spatie\Honeypot\ProtectAgainstSpam::class)
+    ->middleware([\Spatie\Honeypot\ProtectAgainstSpam::class, 'throttle:5,1'])
     ->name('member-registration.store');
 
 Route::permanentRedirect('/berita', '/artikel');
@@ -71,7 +75,7 @@ Route::post('/admin/login', function (Request $request) {
         'remember' => ['nullable'],
     ]);
 
-    if (! auth()->attempt(
+    if (! Auth::attempt(
         ['email' => $validated['email'], 'password' => $validated['password']],
         $request->boolean('remember'),
     )) {
@@ -84,11 +88,11 @@ Route::post('/admin/login', function (Request $request) {
     $request->session()->regenerate();
 
     /** @var User|null $user */
-    $user = auth()->user();
+    $user = Auth::user();
     $panel = Filament::getPanel('admin');
 
     if (! $user || ! $user->canAccessPanel($panel)) {
-        auth()->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -99,7 +103,7 @@ Route::post('/admin/login', function (Request $request) {
     }
 
     return redirect()->intended(Filament::getPanel('admin')->getUrl());
-})->name('admin.login.post');
+})->middleware('throttle:10,1')->name('admin.login.post');
 
 Route::middleware(['auth'])->group(function (): void {
     Route::get('/admin/anggota/{member}/kartu-kta', [MemberCardController::class, 'show'])

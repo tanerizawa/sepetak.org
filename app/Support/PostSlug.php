@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Post;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -47,6 +48,7 @@ final class PostSlug
 
     /**
      * Slug unik untuk penyimpanan (generator AI, duplikasi, dll.).
+     * Menggunakan DB lock untuk mencegah race condition saat concurrent requests.
      */
     public static function uniqueFromTitle(string $title, ?int $ignorePostId = null): string
     {
@@ -54,20 +56,22 @@ final class PostSlug
         $candidate = $base;
         $counter = 1;
 
-        while (self::slugTaken($candidate, $ignorePostId)) {
-            $suffix = '-'.$counter;
-            $trimmedBase = self::truncateSlugBase($base, self::MAX_SLUG_LENGTH - strlen($suffix));
-            $candidate = $trimmedBase.$suffix;
-            $counter++;
-            if ($counter > 50_000) {
-                $candidate = self::truncateSlugBase($base, self::MAX_SLUG_LENGTH - 8).'-'.Str::lower(Str::random(6));
-                if (! self::slugTaken($candidate, $ignorePostId)) {
-                    break;
+        return DB::transaction(function () use (&$candidate, &$counter, $base, $ignorePostId) {
+            while (self::slugTakenWithLock($candidate, $ignorePostId)) {
+                $suffix = '-'.$counter;
+                $trimmedBase = self::truncateSlugBase($base, self::MAX_SLUG_LENGTH - strlen($suffix));
+                $candidate = $trimmedBase.$suffix;
+                $counter++;
+                if ($counter > 50_000) {
+                    $candidate = self::truncateSlugBase($base, self::MAX_SLUG_LENGTH - 8).'-'.Str::lower(Str::random(6));
+                    if (! self::slugTakenWithLock($candidate, $ignorePostId)) {
+                        break;
+                    }
                 }
             }
-        }
 
-        return $candidate;
+            return $candidate;
+        });
     }
 
     /**
@@ -89,7 +93,7 @@ final class PostSlug
         return rtrim($chopped, '-');
     }
 
-    private static function slugTaken(string $slug, ?int $ignorePostId): bool
+    private static function slugTakenWithLock(string $slug, ?int $ignorePostId): bool
     {
         return Post::withTrashed()
             ->when($ignorePostId !== null, fn ($q) => $q->where('id', '!=', $ignorePostId))

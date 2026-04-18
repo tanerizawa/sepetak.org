@@ -44,7 +44,11 @@ class AgrarianCaseStatusNotificationTest extends TestCase
         $viewer->syncRoles(['viewer']);
 
         $case = AgrarianCase::create([
+            'case_code' => 'CASE-001',
             'title' => 'Kasus Telukjaya',
+            'summary' => 'Ringkasan',
+            'description' => 'Deskripsi',
+            'start_date' => now()->toDateString(),
             'status' => 'reported',
             'priority' => 'medium',
             'lead_user_id' => $lead->id,
@@ -72,7 +76,11 @@ class AgrarianCaseStatusNotificationTest extends TestCase
         $admin->syncRoles(['admin']);
 
         $case = AgrarianCase::create([
+            'case_code' => 'CASE-002',
             'title' => 'Kasus Tanpa Perubahan Status',
+            'summary' => 'Ringkasan',
+            'description' => 'Deskripsi',
+            'start_date' => now()->toDateString(),
             'status' => 'reported',
             'priority' => 'medium',
         ]);

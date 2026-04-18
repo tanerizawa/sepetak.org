@@ -4,7 +4,10 @@ namespace App\Services\AiProviders;
 
 use App\Contracts\ArticleAiProvider;
 use App\DTOs\ArticleAiResponse;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -44,25 +47,70 @@ class OpenRouterProvider implements ArticleAiProvider
             throw new RuntimeException('OpenRouter API key is not configured.');
         }
 
+        $this->throwIfCircuitOpen();
+
         $model = (string) ($options['model'] ?? $this->model);
         $maxTokens = (int) ($options['max_tokens'] ?? $this->maxTokens);
         $temperature = (float) ($options['temperature'] ?? $this->temperature);
 
-        $response = $this->chatCompletion($model, $systemPrompt, $userPrompt, $maxTokens, $temperature);
+        $attempts = max(1, (int) config('article-generator.openrouter.retry.attempts', 2));
+        $baseSleepMs = max(0, (int) config('article-generator.openrouter.retry.base_sleep_ms', 350));
+        $maxSleepMs = max(0, (int) config('article-generator.openrouter.retry.max_sleep_ms', 4000));
 
-        if ($response->failed()) {
-            $error = $response->json('error.message', $response->body());
-            $fallback = $this->effectiveFallbackModel($model);
-            if ($fallback !== null && $this->isNoEndpointsFoundError($error)) {
-                $response = $this->chatCompletion($fallback, $systemPrompt, $userPrompt, $maxTokens, $temperature);
-                $model = $fallback;
+        $response = null;
+        $lastException = null;
+        $fallback = $this->effectiveFallbackModel($model);
+        $primaryModel = $model;
+
+        for ($i = 1; $i <= $attempts; $i++) {
+            try {
+                $response = $this->chatCompletion($model, $systemPrompt, $userPrompt, $maxTokens, $temperature);
+                $lastException = null;
+            } catch (\Throwable $e) {
+                $lastException = $e;
+                $response = null;
+
+                if (! $this->isRetryableException($e) || $i >= $attempts) {
+                    break;
+                }
+
+                $this->sleepWithBackoff($i, $baseSleepMs, $maxSleepMs);
+                continue;
             }
+
+            if ($response->successful()) {
+                break;
+            }
+
+            $error = (string) $response->json('error.message', $response->body());
+
+            if ($fallback !== null && $model === $primaryModel && $this->isNoEndpointsFoundError($error)) {
+                $model = $fallback;
+                $fallback = null;
+
+                continue;
+            }
+
+            if ($this->isRetryableResponse($response) && $i < $attempts) {
+                $this->sleepWithBackoff($i, $baseSleepMs, $maxSleepMs);
+                continue;
+            }
+
+            break;
+        }
+
+        if ($response === null) {
+            $this->recordFailureAndMaybeOpenCircuit($lastException?->getMessage() ?? 'Unknown OpenRouter failure.');
+            throw new RuntimeException('OpenRouter request failed.', previous: $lastException);
         }
 
         if ($response->failed()) {
-            $error = $response->json('error.message', $response->body());
+            $error = (string) $response->json('error.message', $response->body());
+            $this->recordFailureAndMaybeOpenCircuit($error);
             throw new RuntimeException("OpenRouter API error: {$error}");
         }
+
+        $this->resetCircuitBreaker();
 
         $data = $response->json();
 
@@ -112,6 +160,100 @@ class OpenRouterProvider implements ArticleAiProvider
                 'max_tokens' => $maxTokens,
                 'temperature' => $temperature,
             ]);
+    }
+
+    private function isRetryableResponse(Response $response): bool
+    {
+        $status = $response->status();
+
+        if ($status === 408 || $status === 429) {
+            return true;
+        }
+
+        return $status >= 500 && $status <= 599;
+    }
+
+    private function isRetryableException(\Throwable $e): bool
+    {
+        return $e instanceof ConnectionException;
+    }
+
+    private function sleepWithBackoff(int $attempt, int $baseSleepMs, int $maxSleepMs): void
+    {
+        if ($baseSleepMs <= 0) {
+            return;
+        }
+
+        $multiplier = max(1, $attempt);
+        $sleepMs = min($maxSleepMs, $baseSleepMs * (2 ** ($multiplier - 1)));
+        $jitter = random_int(0, max(0, (int) round($sleepMs * 0.15)));
+        $sleepMs = max(0, $sleepMs + $jitter);
+
+        if ($sleepMs <= 0) {
+            return;
+        }
+
+        usleep($sleepMs * 1000);
+    }
+
+    private function circuitBreakerEnabled(): bool
+    {
+        return (bool) config('article-generator.openrouter.circuit_breaker.enabled', true);
+    }
+
+    private function circuitBreakerKeyPrefix(): string
+    {
+        return (string) config('article-generator.openrouter.circuit_breaker.cache_key_prefix', 'openrouter:circuit');
+    }
+
+    private function throwIfCircuitOpen(): void
+    {
+        if (! $this->circuitBreakerEnabled()) {
+            return;
+        }
+
+        $openUntil = Cache::get($this->circuitBreakerKeyPrefix().':open_until');
+        if (! is_int($openUntil)) {
+            return;
+        }
+
+        if (time() < $openUntil) {
+            throw new RuntimeException('OpenRouter circuit breaker is open.');
+        }
+    }
+
+    private function recordFailureAndMaybeOpenCircuit(string $errorMessage): void
+    {
+        if (! $this->circuitBreakerEnabled()) {
+            return;
+        }
+
+        $threshold = max(1, (int) config('article-generator.openrouter.circuit_breaker.failure_threshold', 3));
+        $windowSeconds = max(10, (int) config('article-generator.openrouter.circuit_breaker.window_seconds', 60));
+        $openSeconds = max(30, (int) config('article-generator.openrouter.circuit_breaker.open_seconds', 300));
+        $prefix = $this->circuitBreakerKeyPrefix();
+
+        $failuresKey = $prefix.':failures';
+        $count = (int) Cache::get($failuresKey, 0);
+        $count++;
+        Cache::put($failuresKey, $count, $windowSeconds);
+
+        if ($count < $threshold) {
+            return;
+        }
+
+        Cache::put($prefix.':open_until', CarbonImmutable::now()->addSeconds($openSeconds)->getTimestamp(), $openSeconds);
+    }
+
+    private function resetCircuitBreaker(): void
+    {
+        if (! $this->circuitBreakerEnabled()) {
+            return;
+        }
+
+        $prefix = $this->circuitBreakerKeyPrefix();
+        Cache::forget($prefix.':failures');
+        Cache::forget($prefix.':open_until');
     }
 
     private function effectiveFallbackModel(string $primaryModel): ?string

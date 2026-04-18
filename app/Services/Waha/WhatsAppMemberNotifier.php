@@ -42,15 +42,30 @@ final class WhatsAppMemberNotifier
                 continue;
             }
 
-            try {
-                $this->client->sendText($chatId, $text);
+            $sent = false;
+            $lastError = null;
+            for ($attempt = 0; $attempt < 3; $attempt++) {
+                try {
+                    $this->client->sendText($chatId, $text);
+                    $sent = true;
+                    break;
+                } catch (WahaException $e) {
+                    $lastError = $e->getMessage();
+                    if ($attempt < 2) {
+                        $backoffMs = (int) config('waha.broadcast.retry_backoff_ms', 1000) * (2 ** $attempt);
+                        usleep($backoffMs * 1000);
+                    }
+                }
+            }
+
+            if ($sent) {
                 $results[] = ['member_id' => (int) $member->id, 'ok' => true];
-            } catch (WahaException $e) {
-                Log::warning('WhatsAppMemberNotifier: send failed', [
+            } else {
+                Log::warning('WhatsAppMemberNotifier: send failed after retries', [
                     'member_id' => $member->id,
-                    'error' => $e->getMessage(),
+                    'error' => $lastError,
                 ]);
-                $results[] = ['member_id' => (int) $member->id, 'ok' => false, 'error' => $e->getMessage()];
+                $results[] = ['member_id' => (int) $member->id, 'ok' => false, 'error' => $lastError];
             }
 
             if ($delayUs > 0) {

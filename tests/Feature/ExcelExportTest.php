@@ -22,6 +22,18 @@ class ExcelExportTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $path = sys_get_temp_dir().'/sepetak-laravel-excel';
+        if (! is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        config(['excel.temporary_files.local_path' => $path]);
+    }
+
     public function test_members_export_produces_xlsx_with_expected_rows(): void
     {
         Member::create([
@@ -41,7 +53,11 @@ class ExcelExportTest extends TestCase
     public function test_agrarian_cases_export_download(): void
     {
         AgrarianCase::create([
+            'case_code' => 'CASE-EXPORT-1',
             'title'    => 'Kasus Export',
+            'summary' => 'Ringkasan',
+            'description' => 'Deskripsi',
+            'start_date' => now()->toDateString(),
             'status'   => 'reported',
             'priority' => 'medium',
         ]);
@@ -58,7 +74,9 @@ class ExcelExportTest extends TestCase
     public function test_advocacy_programs_export_download(): void
     {
         AdvocacyProgram::create([
+            'program_code' => 'PRG-EXPORT-1',
             'title'      => 'Program Uji',
+            'description' => 'Deskripsi program uji',
             'status'     => 'active',
             'start_date' => now(),
         ]);

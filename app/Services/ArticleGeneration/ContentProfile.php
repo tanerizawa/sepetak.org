@@ -27,18 +27,8 @@ enum ContentProfile: string
      */
     public static function forArticleGeneration(?ArticlePool $pool, ArticleTopic $topic): self
     {
-        $topicWantsPractical = self::topicSignalsMemberPractical($topic);
-
         if ($pool !== null) {
-            if (self::fromPool($pool) === self::MemberPractical) {
-                return self::MemberPractical;
-            }
-
-            if ($topicWantsPractical) {
-                return self::MemberPractical;
-            }
-
-            return self::Pillar;
+            return self::fromPool($pool);
         }
 
         if ($topic->getKey() === null) {
@@ -51,7 +41,7 @@ enum ContentProfile: string
             return self::MemberPractical;
         }
 
-        if ($topicWantsPractical) {
+        if (self::topicSignalsMemberPractical($topic)) {
             return self::MemberPractical;
         }
 
@@ -59,17 +49,17 @@ enum ContentProfile: string
     }
 
     /**
-     * Topik “materi harian / panduan anggota” tanpa melihat pool yang sedang di-dispatch.
+     * Topik "materi harian / panduan anggota" tanpa melihat pool yang sedang di-dispatch.
      */
     private static function topicSignalsMemberPractical(ArticleTopic $topic): bool
     {
-        if ($topic->getKey() === null) {
-            return false;
-        }
-
         $practicalTypes = config('article-generator.member_practical_article_types', ['member_guide']);
         if (in_array((string) $topic->article_type, $practicalTypes, true)) {
             return true;
+        }
+
+        if ($topic->getKey() === null) {
+            return false;
         }
 
         $practicalCategorySlugs = config('article-generator.member_practical_category_slugs', ['panduan-tips-anggota']);

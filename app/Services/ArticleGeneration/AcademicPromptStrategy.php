@@ -144,7 +144,10 @@ PROMPT;
         }
 
         if ($topic->prompt_template) {
-            $parts[] = "**Instruksi tambahan:**\n{$topic->prompt_template}";
+            $template = PromptSanitizer::sanitize((string) $topic->prompt_template);
+            if ($template !== '') {
+                $parts[] = "**Instruksi tambahan:**\n{$template}";
+            }
         }
 
         $parts[] = '═══ MULAI MENULIS ═══'."\n\n".'Tulis artikelnya sekarang. Mulai langsung dari judul (# Judul), lalu metadata, daftar isi, dan seterusnya sesuai struktur **ilmiah** yang ditentukan.';

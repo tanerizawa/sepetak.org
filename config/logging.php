@@ -58,6 +58,20 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'article_metrics_file' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/article_metrics.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => env('ARTICLE_METRICS_LOG_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        'article_metrics' => [
+            'driver' => 'stack',
+            'channels' => explode(',', env('ARTICLE_METRICS_LOG_STACK', env('APP_ENV') === 'testing' ? 'null' : 'article_metrics_file')),
+            'ignore_exceptions' => true,
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

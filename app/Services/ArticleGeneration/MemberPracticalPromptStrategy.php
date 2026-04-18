@@ -78,7 +78,10 @@ PROMPT;
         }
 
         if ($topic->prompt_template) {
-            $parts[] = "**Instruksi tambahan:**\n{$topic->prompt_template}";
+            $template = PromptSanitizer::sanitize((string) $topic->prompt_template);
+            if ($template !== '') {
+                $parts[] = "**Instruksi tambahan:**\n{$template}";
+            }
         }
 
         if ($recentAutoPostTitles !== []) {

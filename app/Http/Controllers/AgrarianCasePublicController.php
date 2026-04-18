@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\AgrarianCase;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class AgrarianCasePublicController extends Controller
 {
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
         $cases = AgrarianCase::query()
             ->orderByDesc('start_date')
             ->orderByDesc('id')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
+        if ($cases->isEmpty() && $cases->currentPage() > 1) {
+            return redirect()->to($cases->url($cases->lastPage()));
+        }
 
         return view('agrarian-cases.index', [
             'cases' => $cases,

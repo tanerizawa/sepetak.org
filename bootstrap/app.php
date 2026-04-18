@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule): void {
         // `articles:generate` memeriksa `ArticlePool::isDueAt()` per pool (ringan bila tidak ada yang jatuh tempo).
         $schedule->command('articles:generate')->everyMinute()->withoutOverlapping();
+        $schedule->command('ai:check-openrouter-key-rotation')->daily();
     })
     ->withMiddleware(function (Middleware $middleware) {
         // Di belakang reverse proxy (Nginx, Cloudflare, load balancer), tanpa ini

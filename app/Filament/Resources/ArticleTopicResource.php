@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ArticleTopicResource\Pages;
 use App\Models\ArticleTopic;
+use App\Services\ArticleGeneration\PromptSanitizer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -49,7 +50,11 @@ class ArticleTopicResource extends Resource
                 Forms\Components\Textarea::make('description')->label('Deskripsi')->rows(3)->columnSpanFull(),
                 Forms\Components\Textarea::make('thinking_framework')->label('Kerangka Berpikir')->rows(4)->columnSpanFull(),
                 Forms\Components\KeyValue::make('key_references')->label('Referensi Kunci')->columnSpanFull(),
-                Forms\Components\Textarea::make('prompt_template')->label('Template Prompt (opsional)')->rows(4)->columnSpanFull(),
+                Forms\Components\Textarea::make('prompt_template')
+                    ->label('Template Prompt (opsional)')
+                    ->rows(4)
+                    ->dehydrateStateUsing(fn ($state) => PromptSanitizer::sanitizeNullable(is_string($state) ? $state : null))
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('weight')->label('Bobot')->numeric()->default(1)->minValue(1),
                 Forms\Components\TextInput::make('max_uses')->label('Maks Pakai (kosong = tak terbatas)')->numeric()->minValue(1),
                 Forms\Components\Toggle::make('is_active')->label('Aktif')->default(true),

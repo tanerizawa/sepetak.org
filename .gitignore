@@ -28,6 +28,10 @@ yarn-error.log
 .phpactor.json
 /ops/waha/.env
 /ops/waha/data
+/ops/waha/sessions
+/public/vendor
+/.phpunit.cache
+/.phpunit.cache/
 
 # keep recovery artifacts
 !/docs/recovery

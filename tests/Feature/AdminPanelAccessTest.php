@@ -97,7 +97,11 @@ class AdminPanelAccessTest extends TestCase
         $user->assignRole('operator');
 
         $case = AgrarianCase::create([
+            'case_code' => 'CASE-POLICY-1',
             'title'    => 'Case',
+            'summary' => 'Ringkasan',
+            'description' => 'Deskripsi',
+            'start_date' => now()->toDateString(),
             'status'   => 'reported',
             'priority' => 'medium',
         ]);

@@ -21,7 +21,7 @@ class GenerateArticleJob implements ShouldBeUnique, ShouldQueue
 
     public int $timeout = 300;
 
-    public int $uniqueFor = 3600; // 1 hour uniqueness window
+    public int $uniqueFor = 300; // 5 minutes - allows rapid retry on failure within tolerance
 
     public function __construct(
         public ArticleTopic $topic,

@@ -9,46 +9,165 @@
  * ==========================================================================*/
 
 @layer base {
-    html {
-        background: #FCF9F1;
+    :root {
+        --paper-50: 42 45% 96%;
+        --paper-100: 42 40% 93%;
+        --paper-200: 42 33% 88%;
+        --paper-300: 42 26% 80%;
+
+        --ink-900: 222 15% 12%;
+        --ink-800: 222 14% 18%;
+        --ink-700: 222 12% 28%;
+        --ink-200: 222 8% 78%;
+        --ink-100: 222 8% 88%;
+        --ink-50: 222 10% 96%;
+
+        --flag-50: 352 55% 96%;
+        --flag-100: 352 55% 92%;
+        --flag-200: 352 58% 85%;
+        --flag-300: 352 60% 74%;
+        --flag-400: 352 62% 58%;
+        --flag-500: 352 62% 45%;
+        --flag-600: 352 66% 38%;
+        --flag-700: 352 68% 30%;
+        --flag-800: 352 70% 24%;
+        --flag-900: 352 72% 16%;
+
+        --ochre-400: 38 70% 56%;
+        --ochre-500: 38 70% 48%;
+        --ochre-600: 38 70% 40%;
+        --ochre-700: 38 70% 32%;
+
+        --earth-500: 24 45% 34%;
+        --earth-600: 24 45% 26%;
+
+        --space-1: 8px;
+        --space-2: 13px;
+        --space-3: 21px;
+        --space-4: 34px;
+        --space-5: 55px;
+        --space-6: 89px;
     }
+
+    html[data-theme="kopi-kertas"] {
+        --paper-50: 40 55% 95%;
+        --paper-100: 40 50% 92%;
+        --paper-200: 40 40% 87%;
+        --paper-300: 40 32% 79%;
+
+        --ink-900: 25 18% 12%;
+        --ink-800: 25 18% 18%;
+        --ink-700: 25 16% 28%;
+        --ink-200: 25 10% 78%;
+        --ink-100: 25 10% 88%;
+        --ink-50: 25 12% 96%;
+
+        --flag-50: 352 55% 96%;
+        --flag-100: 352 55% 92%;
+        --flag-200: 352 58% 85%;
+        --flag-300: 352 60% 74%;
+        --flag-400: 352 62% 58%;
+        --flag-500: 352 62% 45%;
+        --flag-600: 352 66% 38%;
+        --flag-700: 352 68% 30%;
+        --flag-800: 352 70% 24%;
+        --flag-900: 352 72% 16%;
+
+        --earth-500: 24 45% 34%;
+        --earth-600: 24 45% 26%;
+    }
+
+    html[data-theme="senja-modern"] {
+        --paper-50: 44 42% 96%;
+        --paper-100: 44 38% 93%;
+        --paper-200: 44 30% 88%;
+        --paper-300: 44 24% 80%;
+
+        --ink-900: 220 16% 14%;
+        --ink-800: 220 16% 20%;
+        --ink-700: 220 14% 30%;
+        --ink-200: 220 10% 78%;
+        --ink-100: 220 10% 88%;
+        --ink-50: 220 12% 96%;
+
+        --flag-50: 350 45% 96%;
+        --flag-100: 350 45% 92%;
+        --flag-200: 350 48% 85%;
+        --flag-300: 350 50% 74%;
+        --flag-400: 350 52% 58%;
+        --flag-500: 350 55% 44%;
+        --flag-600: 350 58% 36%;
+        --flag-700: 350 60% 28%;
+        --flag-800: 350 62% 22%;
+        --flag-900: 350 64% 16%;
+    }
+
+    html {
+        background: hsl(var(--paper-50));
+    }
+
     body {
         font-family: "Work Sans", Inter, system-ui, sans-serif;
         font-weight: 400;
-        color: #0D0D0D;
-        background: #FCF9F1;
+        color: hsl(var(--ink-900));
+        background: hsl(var(--paper-50));
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
     }
+
     /* Skala heading default — semua display memakai Anton uppercase */
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
         font-family: Anton, "Archivo Black", Impact, sans-serif;
         text-transform: uppercase;
         letter-spacing: 0.005em;
-        color: #0D0D0D;
+        color: hsl(var(--ink-900));
     }
-    h1 { font-weight: 400; }
-    h2 { font-weight: 400; letter-spacing: 0.02em; }
-    h3 { font-weight: 400; letter-spacing: 0.04em; }
+
+    h1 {
+        font-weight: 400;
+        font-size: clamp(3.4rem, 8vw, 6.875rem);
+        line-height: 0.92;
+    }
+
+    h2 {
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        font-size: clamp(2.625rem, 6vw, 4.25rem);
+        line-height: 0.95;
+    }
+
+    h3 {
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        font-size: clamp(1.625rem, 4.5vw, 2.625rem);
+        line-height: 1.05;
+    }
 
     /* Focus ring — ochre 3px agar kontras di atas flag/ink/paper */
     :focus-visible {
-        outline: 3px solid #D4A017;
+        outline: 3px solid hsl(var(--ochre-500));
         outline-offset: 2px;
     }
 
     ::selection {
-        background: #C8102E;
-        color: #FCF9F1;
+        background: hsl(var(--flag-500));
+        color: hsl(var(--paper-50));
     }
 
     /* Hapus radius default dari reset — konsisten dengan prinsip "sudut tegas" */
-    button, input, select, textarea {
+    button,
+    input,
+    select,
+    textarea {
         border-radius: 0;
     }
+
 }
 
 @layer components {
+
     /* ------------------------------------------------------------------------
      * Tombol poster — solid hitam atau ghost merah.
      * ------------------------------------------------------------------------*/
@@ -62,51 +181,58 @@
         font-weight: 400;
         text-transform: uppercase;
         letter-spacing: 0.12em;
-        border: 3px solid #0D0D0D;
-        transition: transform 120ms ease-out, box-shadow 120ms ease-out;
+        border: 3px solid hsl(var(--ink-900));
+        transition: transform 200ms ease-out, box-shadow 200ms ease-out, background-color 200ms ease-out, color 200ms ease-out;
     }
+
     .btn-rev-solid {
-        background: #0D0D0D;
-        color: #FCF9F1;
-        box-shadow: 4px 4px 0 #C8102E;
+        background: hsl(var(--ink-900));
+        color: hsl(var(--paper-50));
+        box-shadow: 4px 4px 0 hsl(var(--flag-500));
     }
+
     .btn-rev-solid:hover {
         transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0 #C8102E;
+        box-shadow: 6px 6px 0 hsl(var(--flag-500));
     }
+
     .btn-rev-ghost {
         background: transparent;
-        color: #0D0D0D;
-        box-shadow: 4px 4px 0 #0D0D0D;
+        color: hsl(var(--ink-900));
+        box-shadow: 4px 4px 0 hsl(var(--ink-900));
     }
+
     .btn-rev-ghost:hover {
         transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0 #0D0D0D;
-        background: #FCF9F1;
+        box-shadow: 6px 6px 0 hsl(var(--ink-900));
+        background: hsl(var(--paper-50));
     }
+
     .btn-rev-red {
-        background: #C8102E;
-        color: #FCF9F1;
-        border-color: #0D0D0D;
-        box-shadow: 4px 4px 0 #0D0D0D;
+        background: hsl(var(--flag-500));
+        color: hsl(var(--paper-50));
+        border-color: hsl(var(--ink-900));
+        box-shadow: 4px 4px 0 hsl(var(--ink-900));
     }
+
     .btn-rev-red:hover {
         transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0 #0D0D0D;
+        box-shadow: 6px 6px 0 hsl(var(--ink-900));
     }
 
     /* ------------------------------------------------------------------------
      * Kartu gaya poster — border 4px hitam + hard shadow.
      * ------------------------------------------------------------------------*/
     .card-poster {
-        background: #FCF9F1;
-        border: 4px solid #0D0D0D;
-        box-shadow: 8px 8px 0 #C8102E;
-        transition: transform 140ms ease-out, box-shadow 140ms ease-out;
+        background: hsl(var(--paper-50));
+        border: 4px solid hsl(var(--ink-900));
+        box-shadow: 8px 8px 0 hsl(var(--flag-500));
+        transition: transform 200ms ease-out, box-shadow 200ms ease-out;
     }
+
     .card-poster:hover {
         transform: translate(-2px, -2px);
-        box-shadow: 10px 10px 0 #C8102E;
+        box-shadow: 10px 10px 0 hsl(var(--flag-500));
     }
 
     /* ------------------------------------------------------------------------
@@ -118,9 +244,15 @@
         animation: ticker-scroll 40s linear infinite;
         will-change: transform;
     }
+
     @keyframes ticker-scroll {
-        from { transform: translateX(0); }
-        to   { transform: translateX(-50%); }
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-50%);
+        }
     }
 
     /* ------------------------------------------------------------------------
@@ -129,6 +261,7 @@
     .grain-overlay {
         position: relative;
     }
+
     .grain-overlay::after {
         content: '';
         position: absolute;
@@ -144,7 +277,7 @@
      * ------------------------------------------------------------------------*/
     .divider-diagonal {
         height: 3rem;
-        background: #C8102E;
+        background: hsl(var(--flag-500));
         clip-path: polygon(0 0, 100% 2rem, 100% 100%, 0 calc(100% - 2rem));
     }
 
@@ -153,19 +286,20 @@
      * ------------------------------------------------------------------------*/
     .stat-number {
         font-family: Anton, sans-serif;
-        font-size: clamp(3.5rem, 9vw, 9.75rem);
+        font-size: clamp(3.4rem, 9vw, 8.5rem);
         font-weight: 400;
         line-height: 0.9;
         letter-spacing: -0.02em;
-        color: #C8102E;
+        color: hsl(var(--flag-500));
         font-variant-numeric: tabular-nums;
     }
+
     .stat-label {
         font-family: "Space Mono", monospace;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.24em;
-        color: #0D0D0D;
+        color: hsl(var(--ink-900));
     }
 
     /* ------------------------------------------------------------------------
@@ -176,7 +310,22 @@
         font-size: 0.6875rem;
         text-transform: uppercase;
         letter-spacing: 0.2em;
-        color: #0D0D0D;
+        color: hsl(var(--ink-900));
+    }
+
+    .home-article-tab:hover {
+        border-color: hsl(var(--ink-900) / 0.3);
+        background: hsl(var(--paper-100));
+    }
+
+    .home-article-tab[aria-selected="true"] {
+        background: hsl(var(--ink-900));
+        color: hsl(var(--paper-50));
+        border-color: hsl(var(--ink-900));
+    }
+
+    .home-article-tab[aria-selected="true"]:hover {
+        background: hsl(var(--ink-800));
     }
 
     /* ------------------------------------------------------------------------
@@ -184,71 +333,112 @@
      * ------------------------------------------------------------------------*/
     .prose-rev {
         font-family: "Work Sans", sans-serif;
-        color: #0D0D0D;
-        font-size: 1.0625rem;
-        line-height: 1.7;
+        color: hsl(var(--ink-900));
+        font-size: 1rem;
+        line-height: 1.65;
         max-width: 72ch;
     }
-    .prose-rev h1, .prose-rev h2, .prose-rev h3 {
+
+    .prose-rev h1,
+    .prose-rev h2,
+    .prose-rev h3 {
         font-family: Anton, sans-serif;
         text-transform: uppercase;
-        color: #0D0D0D;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
+        color: hsl(var(--ink-900));
+        margin-top: var(--space-5);
+        margin-bottom: var(--space-2);
     }
+
     .prose-rev h2 {
-        font-size: 1.875rem;
-        border-bottom: 4px solid #C8102E;
+        font-size: clamp(1.9rem, 3.2vw, 2.625rem);
+        border-bottom: 4px solid hsl(var(--flag-500));
         padding-bottom: 0.25rem;
         letter-spacing: 0.01em;
     }
-    .prose-rev h3 { font-size: 1.375rem; letter-spacing: 0.03em; }
-    .prose-rev p, .prose-rev ul, .prose-rev ol { margin: 1rem 0; }
-    .prose-rev ul, .prose-rev ol { padding-left: 1.25rem; }
-    .prose-rev ul li::marker { color: #C8102E; }
-    .prose-rev ol { list-style: decimal; }
-    .prose-rev a { color: #C8102E; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
-    .prose-rev a:hover { background: #C8102E; color: #FCF9F1; }
+
+    .prose-rev h3 {
+        font-size: clamp(1.4rem, 2.4vw, 1.625rem);
+        letter-spacing: 0.03em;
+    }
+
+    .prose-rev p,
+    .prose-rev ul,
+    .prose-rev ol {
+        margin: var(--space-3) 0;
+    }
+
+    .prose-rev ul,
+    .prose-rev ol {
+        padding-left: 1.25rem;
+    }
+
+    .prose-rev ul li::marker {
+        color: hsl(var(--flag-500));
+    }
+
+    .prose-rev ol {
+        list-style: decimal;
+    }
+
+    .prose-rev a {
+        color: hsl(var(--flag-600));
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+    }
+
+    .prose-rev a:hover {
+        background: hsl(var(--flag-500));
+        color: hsl(var(--paper-50));
+    }
+
     .prose-rev blockquote {
-        border-left: 6px solid #C8102E;
-        background: #F4EEDB;
+        border-left: 6px solid hsl(var(--flag-500));
+        background: hsl(var(--paper-100));
         padding: 1rem 1.25rem;
         font-family: "Roboto Slab", serif;
         font-style: italic;
         margin: 1.5rem 0;
     }
+
     .prose-rev code {
-        background: #0D0D0D;
-        color: #FCF9F1;
+        background: hsl(var(--ink-900));
+        color: hsl(var(--paper-50));
         padding: 0.125rem 0.375rem;
         font-family: "Space Mono", monospace;
         font-size: 0.875em;
     }
+
     .prose-rev img {
-        border: 4px solid #0D0D0D;
-        box-shadow: 6px 6px 0 #C8102E;
+        border: 4px solid hsl(var(--ink-900));
+        box-shadow: 6px 6px 0 hsl(var(--flag-500));
         max-width: 100%;
         height: auto;
         margin: 1.5rem 0;
     }
 
     /* Drop cap untuk paragraf pertama — halaman statis / teks pendek */
-    .prose-rev:not(.prose-rev--article) > p:first-of-type::first-letter {
+    .prose-rev:not(.prose-rev--article)>p:first-of-type::first-letter {
         font-family: Anton, sans-serif;
         font-size: 4.5rem;
         line-height: 1;
         float: left;
         padding-right: 0.5rem;
-        color: #C8102E;
+        color: hsl(var(--flag-500));
     }
 
     /* ------------------------------------------------------------------------
      * Prose khusus halaman artikel (Markdown AI + masthead judul terpisah).
      * ------------------------------------------------------------------------*/
     .prose-rev--article {
-        max-width: none;
-        width: 100%;
+        max-width: 72ch;
+        margin-inline: auto;
+        width: min(72ch, 100%);
+        font-family: "Roboto Slab", ui-serif, Georgia, serif;
+        font-size: clamp(1.02rem, 0.95rem + 0.35vw, 1.125rem);
+        line-height: 1.9;
     }
+
     /* Rata kiri-kanan — tubuh teks ilmiah; judul tetap kiri */
     .prose-rev--article p,
     .prose-rev--article li,
@@ -260,6 +450,11 @@
         -webkit-hyphens: auto;
         hyphenate-limit-chars: 8 4 4;
     }
+
+    .prose-rev--article p + p {
+        text-indent: 1.5em;
+    }
+
     .prose-rev--article h1,
     .prose-rev--article h2,
     .prose-rev--article h3,
@@ -270,47 +465,54 @@
         text-align: start;
         hyphens: manual;
     }
+
     .prose-rev--article h2,
     .prose-rev--article h3,
     .prose-rev--article h4 {
         scroll-margin-top: 5.5rem;
     }
+
     .prose-rev--article hr {
         border: 0;
-        border-top: 3px solid #0D0D0D;
+        border-top: 3px solid hsl(var(--ink-900));
         opacity: 0.22;
         margin: 2.25rem 0;
     }
+
     .prose-rev--article hr.article-disclosure-divider {
         opacity: 1;
-        border-top-color: #C8102E;
+        border-top-color: hsl(var(--flag-500));
         margin: 2.5rem 0 1rem;
     }
+
     .prose-rev--article aside.article-disclosure,
     .prose-rev--article .article-disclosure {
-        border: 3px solid #0D0D0D;
-        border-left: 6px solid #C8102E;
-        background: #F4EEDB;
+        border: 3px solid hsl(var(--ink-900));
+        border-left: 6px solid hsl(var(--flag-500));
+        background: hsl(var(--paper-100));
         padding: 1rem 1.25rem;
         margin-top: 0;
         font-size: 0.95rem;
         line-height: 1.65;
         font-style: italic;
     }
+
     .prose-rev--article table {
         width: 100%;
         border-collapse: collapse;
         margin: 1.5rem 0;
         font-size: 0.95rem;
     }
+
     .prose-rev--article th,
     .prose-rev--article td {
-        border: 2px solid #0D0D0D;
+        border: 2px solid hsl(var(--ink-900));
         padding: 0.5rem 0.65rem;
         text-align: left;
     }
+
     .prose-rev--article th {
-        background: #FFF2F3;
+        background: hsl(var(--flag-100));
         font-family: "Space Mono", ui-monospace, monospace;
         font-size: 0.7rem;
         text-transform: uppercase;
@@ -323,16 +525,19 @@
         font-style: italic;
         font-family: "Roboto Slab", ui-serif, Georgia, serif;
     }
+
     .prose-rev--article strong,
     .prose-rev--article b {
         font-weight: 700;
         font-style: normal;
         letter-spacing: 0.01em;
     }
+
     .prose-rev--article cite {
         font-style: italic;
         font-family: "Roboto Slab", ui-serif, Georgia, serif;
     }
+
     .prose-rev--article sup,
     .prose-rev--article sub {
         font-size: 0.75em;
@@ -340,8 +545,15 @@
         position: relative;
         vertical-align: baseline;
     }
-    .prose-rev--article sup { top: -0.35em; }
-    .prose-rev--article sub { top: 0.2em; }
+
+    .prose-rev--article sup {
+        top: -0.35em;
+    }
+
+    .prose-rev--article sub {
+        top: 0.2em;
+    }
+
     .prose-rev--article h4 {
         font-family: Anton, sans-serif;
         text-transform: uppercase;
@@ -349,13 +561,15 @@
         letter-spacing: 0.04em;
         margin-top: 1.75rem;
         margin-bottom: 0.65rem;
-        color: #0D0D0D;
+        color: hsl(var(--ink-900));
     }
+
     .prose-rev--article blockquote strong,
     .prose-rev--article blockquote b {
         font-family: "Roboto Slab", ui-serif, Georgia, serif;
         font-weight: 700;
     }
+
     /* Sitasi tanda kurung — sedikit jarak agar mudah dibaca */
     .prose-rev--article p,
     .prose-rev--article li {
@@ -368,6 +582,7 @@
         flex-direction: column;
         min-height: 0;
     }
+
     .article-toc-nav {
         position: sticky;
         top: calc(4.25rem + env(safe-area-inset-top, 0px));
@@ -376,22 +591,24 @@
         overflow-y: auto;
         overscroll-behavior: contain;
         scrollbar-gutter: stable;
-        background: rgb(252 249 241 / 0.97);
+        background: hsl(var(--paper-50) / 0.97);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
         box-shadow:
-            4px 4px 0 rgb(200 16 46 / 0.3),
-            0 0 0 1px rgb(13 13 13 / 0.08);
+            4px 4px 0 hsl(var(--flag-500) / 0.3),
+            0 0 0 1px hsl(var(--ink-900) / 0.08);
     }
+
     @media (min-width: 1024px) {
         .article-toc-nav {
             top: calc(4.5rem + env(safe-area-inset-top, 0px));
             max-height: calc(100dvh - 5.75rem - env(safe-area-inset-bottom, 0px));
             box-shadow:
-                6px 6px 0 rgb(200 16 46 / 0.35),
-                0 0 0 1px rgb(13 13 13 / 0.08);
+                6px 6px 0 hsl(var(--flag-500) / 0.35),
+                0 0 0 1px hsl(var(--ink-900) / 0.08);
         }
     }
+
     .article-toc-nav .article-toc-link {
         font-family: "Work Sans", sans-serif;
         font-weight: 500;
@@ -403,21 +620,66 @@
         box-sizing: border-box;
         align-self: stretch;
     }
+
     .posts-filter-field:is(input, select) {
         padding-top: 0.375rem;
         padding-bottom: 0.375rem;
     }
 }
 
-/* ============================================================================
- * Prefer reduced motion — matikan animasi untuk pengguna sensitif.
- * ==========================================================================*/
+@layer utilities {
+    .line-clamp-2 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .line-clamp-3 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+    }
+
+    .home-snap {
+        scroll-snap-type: none;
+        overscroll-behavior-y: auto;
+    }
+
+    .home-snap-section {
+        scroll-snap-align: unset;
+        scroll-snap-stop: normal;
+    }
+
+    .home-section-hero {
+        min-height: 100vh;
+    }
+
+    .home-section-content {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    .ticker-track { animation: none; transform: none; }
-    .btn-rev:hover, .card-poster:hover { transform: none; }
+
+    .ticker-track {
+        animation: none;
+        transform: none;
+    }
+
+    .btn-rev:hover,
+    .card-poster:hover {
+        transform: none;
+    }
 }

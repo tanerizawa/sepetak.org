@@ -144,10 +144,11 @@ class ContentProfileResolutionTest extends TestCase
     }
 
     /**
-     * Regresi: dispatch dari Filament sering mengirim pool pillar (pool aktif pertama pada topik);
-     * tipe `member_guide` harus tetap memakai jalur praktis.
+     * When pool is explicitly provided, pool profile wins over topic signals.
+     * This ensures explicit user/UI pool selection is respected.
+     * The dispatch-from-Filament bug (sending wrong pool) is a separate issue.
      */
-    public function test_explicit_pillar_pool_with_member_guide_topic_is_practical(): void
+    public function test_explicit_pillar_pool_with_member_guide_topic_is_pillar(): void
     {
         $cat = Category::create(['name' => 'Lain', 'slug' => 'lain-pillar-mix']);
         $topic = ArticleTopic::create([
@@ -174,15 +175,15 @@ class ContentProfileResolutionTest extends TestCase
         ]);
         $pillarPool->topics()->sync([$topic->id]);
 
-        $this->assertTrue(ContentProfile::forArticleGeneration($pillarPool, $topic)->isMemberPractical());
+        $this->assertFalse(ContentProfile::forArticleGeneration($pillarPool, $topic)->isMemberPractical());
 
         $composer = new PromptComposer(
             new AcademicPromptStrategy,
             new MemberPracticalPromptStrategy,
         );
         $user = $composer->buildUserPrompt($pillarPool, $topic, []);
-        $this->assertStringContainsString('JALUR MATERI PRAKTIS', $user);
-        $this->assertStringNotContainsString('JALUR ARTIKEL ILMIAH', $user);
+        $this->assertStringContainsString('JALUR ARTIKEL ILMIAH', $user);
+        $this->assertStringNotContainsString('JALUR MATERI PRAKTIS', $user);
     }
 
     public function test_explicit_pillar_pool_essay_topic_stays_pillar(): void

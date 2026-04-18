@@ -23,12 +23,13 @@ class MemberCreateLivewireTest extends TestCase
         foreach (['superadmin'] as $role) {
             Role::findOrCreate($role, 'web');
         }
-        foreach (['manage-content'] as $p) {
+        foreach (['manage-members'] as $p) {
             Permission::findOrCreate($p, 'web');
         }
         Role::findByName('superadmin', 'web')->syncPermissions(Permission::all());
 
         $admin = User::factory()->create(['is_active' => true]);
+        assert($admin instanceof User);
         $admin->syncRoles(['superadmin']);
         $this->actingAs($admin);
         Filament::setCurrentPanel(Filament::getPanel('admin'));

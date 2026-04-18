@@ -3,8 +3,8 @@
     $v = (string) config('sepetak.logo_asset_version', '3');
 @endphp
 <img
-    src="{{ asset('img/logo/logo-64.png') }}?v={{ $v }}"
-    srcset="{{ asset('img/logo/logo-48.png') }}?v={{ $v }} 48w, {{ asset('img/logo/logo-64.png') }}?v={{ $v }} 64w, {{ asset('img/logo/logo-128.png') }}?v={{ $v }} 128w"
+    src="/img/logo/logo-64.png?v={{ $v }}"
+    srcset="/img/logo/logo-48.png?v={{ $v }} 48w, /img/logo/logo-64.png?v={{ $v }} 64w, /img/logo/logo-128.png?v={{ $v }} 128w"
     sizes="40px"
     alt="{{ $alt ?? 'Logo SEPETAK' }}"
     width="40"

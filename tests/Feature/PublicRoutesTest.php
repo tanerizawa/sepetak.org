@@ -42,9 +42,13 @@ class PublicRoutesTest extends TestCase
         $response->assertOk();
         $response->assertSee('Artikel Publik Uji');
         $response->assertDontSee('Draft Tersembunyi');
+        $response->assertDontSee('home-snap', false);
+        $response->assertDontSee('home-snap-section', false);
+        $response->assertSee('<footer', false);
         $response->assertSee('Daftar kasus agraria', false);
         $response->assertSee('Daftar program advokasi', false);
         $response->assertSee('Informasi pendaftaran anggota', false);
+        $response->assertSee('Kajian Ilmiah', false);
     }
 
     public function test_homepage_renders_when_stats_cache_missing_new_case_keys(): void
@@ -58,8 +62,80 @@ class PublicRoutesTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
+        $response->assertDontSee('home-snap', false);
+        $response->assertDontSee('home-snap-section', false);
+        $response->assertSee('<footer', false);
         $response->assertSee('Daftar kasus agraria', false);
         $response->assertSee(route('agrarian-cases.index', [], false), false);
+    }
+
+    public function test_post_show_uses_landscape_cover_slot_and_bookish_prose_wrapper(): void
+    {
+        $author = User::factory()->create();
+
+        Post::create([
+            'title' => 'Artikel Layout Buku',
+            'slug' => 'artikel-layout-buku',
+            'excerpt' => 'Kutipan',
+            'body' => '<h2>Bab I</h2><p>Paragraf pertama.</p><p>Paragraf kedua.</p>',
+            'status' => 'published',
+            'published_at' => now()->subHour(),
+            'author_id' => $author->id,
+        ]);
+
+        $response = $this->get(route('posts.show', 'artikel-layout-buku'));
+
+        $response->assertOk();
+        $response->assertSee('prose-rev--article', false);
+        $response->assertSee('aspect-video', false);
+    }
+
+    public function test_home_articles_endpoint_limits_to_6_and_paginates(): void
+    {
+        $author = User::factory()->create();
+
+        for ($i = 1; $i <= 7; $i++) {
+            Post::create([
+                'title' => "Artikel Uji {$i}",
+                'slug' => "artikel-uji-{$i}",
+                'excerpt' => "Kutipan {$i}",
+                'body' => "<p>publik {$i}</p>",
+                'status' => 'published',
+                'published_at' => now()->subMinutes(10 - $i),
+                'author_id' => $author->id,
+            ]);
+        }
+
+        $response = $this->getJson('/_home/articles');
+
+        $response->assertOk();
+        $response->assertJsonPath('current_page', 1);
+        $response->assertJsonPath('last_page', 2);
+        $response->assertJsonPath('total', 7);
+        $response->assertJsonPath('next_page_url', url('/_home/articles?page=2'));
+        $response->assertSee('Artikel Uji 7');
+        $response->assertDontSee('Artikel Uji 1');
+    }
+
+    public function test_posts_index_redirects_to_last_page_when_out_of_range(): void
+    {
+        $author = User::factory()->create();
+
+        for ($i = 1; $i <= 10; $i++) {
+            Post::create([
+                'title' => "Artikel Paginasi {$i}",
+                'slug' => "artikel-paginasi-{$i}",
+                'excerpt' => "Kutipan {$i}",
+                'body' => "<p>publik {$i}</p>",
+                'status' => 'published',
+                'published_at' => now()->subMinutes(20 - $i),
+                'author_id' => $author->id,
+            ]);
+        }
+
+        $response = $this->get('/artikel?page=999');
+
+        $response->assertRedirect('/artikel?page=2');
     }
 
     public function test_agrarian_cases_index_renders(): void

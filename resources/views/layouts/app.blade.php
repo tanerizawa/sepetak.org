@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+@php($theme = request()->query('theme'))
+@php($allowedThemes = ['tani-soft', 'kopi-kertas', 'senja-modern'])
+@php($defaultTheme = (string) config('sepetak.theme_default', 'tani-soft'))
+@php($defaultTheme = in_array($defaultTheme, $allowedThemes, true) ? $defaultTheme : 'tani-soft')
+@php($theme = in_array($theme, $allowedThemes, true) ? $theme : $defaultTheme)
+@php($themeColors = [
+    'tani-soft' => 'hsl(352 62% 45%)',
+    'kopi-kertas' => 'hsl(24 45% 34%)',
+    'senja-modern' => 'hsl(350 55% 44%)',
+])
+@php($themeColor = $themeColors[$theme] ?? 'hsl(352 62% 45%)')
+<html lang="id" class="scroll-smooth @yield('html_class')" data-theme="{{ $theme }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="@yield('meta_description', \App\Models\SiteSetting::getValue('site_description', 'SEPETAK - Serikat Pekerja Tani Karawang'))">
-    <meta name="theme-color" content="#C8102E">
+    <meta name="theme-color" content="{{ $themeColor }}">
     <title>@yield('title', \App\Models\SiteSetting::getValue('site_name', 'SEPETAK'))</title>
 
     {{-- Canonical & Feeds --}}
@@ -32,15 +43,25 @@
     <meta name="twitter:description" content="@yield('og_description', $__env->yieldContent('meta_description', \App\Models\SiteSetting::getValue('site_description', 'SEPETAK - Serikat Pekerja Tani Karawang')))">
     <meta name="twitter:image" content="{{ asset('img/logo/logo-512.png') }}?v={{ $logoV }}">
 
-    {{-- Fonts — palet "Tani Merah": Anton (display), Work Sans (body), Space Mono (label), Roboto Slab (blockquote) --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Roboto+Slab:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Work+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Roboto+Slab:wght@400;600&display=swap" rel="stylesheet">
 
-    @if (file_exists(public_path('hot')))
+    @php($isLocal = app()->environment('local'))
+    @php($useViteHot = $isLocal && (bool) config('sepetak.vite_hmr_enabled', false) && file_exists(public_path('hot')))
+    @if ($useViteHot)
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @elseif (is_readable(public_path('build/manifest.json')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @php($manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true) ?: [])
+        @php($css = $manifest['resources/css/app.css']['file'] ?? null)
+        @php($js = $manifest['resources/js/app.js']['file'] ?? null)
+
+        @if ($css)
+            <link rel="stylesheet" href="/build/{{ $css }}">
+        @endif
+        @if ($js)
+            <script type="module" src="/build/{{ $js }}"></script>
+        @endif
     @endif
     @stack('styles')
 
@@ -48,7 +69,7 @@
     @include('partials.jsonld.organization')
     @stack('head')
 </head>
-<body class="bg-paper-50 text-ink-900 antialiased">
+<body class="bg-paper-50 text-ink-900 antialiased @yield('body_class')">
 
     {{-- Skip link untuk pengguna keyboard/screen-reader --}}
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-flag-500 focus:text-paper-50 focus:px-4 focus:py-2 focus:font-display focus:tracking-widest">Lewati ke konten</a>
@@ -71,12 +92,12 @@
     {{-- ================================================================
          Navigation — sticky, border hitam tebal
          ================================================================ --}}
-    <nav class="bg-paper-50 border-b-4 border-ink-900 sticky top-0 z-50 shadow-[0_4px_0_#C8102E]">
+    <nav class="bg-paper-50/90 border-b-4 border-ink-900 sticky top-0 z-50 shadow-[0_4px_0_hsl(var(--flag-500))] backdrop-blur-[10px] transition-colors duration-200 ease-out">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 {{-- Logo --}}
                 <a href="{{ route('beranda') }}" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 border-2 border-ink-900 overflow-hidden bg-flag-500 flex-shrink-0 shadow-[2px_2px_0_#0D0D0D] group-hover:opacity-95 transition-opacity">
+                    <div class="w-10 h-10 border-2 border-ink-900 overflow-hidden bg-flag-500 flex-shrink-0 shadow-[2px_2px_0_hsl(var(--ink-900))] group-hover:opacity-95 transition-opacity">
                         @include('partials.logo-mark')
                     </div>
                     <div class="leading-none">
@@ -101,7 +122,7 @@
                 </div>
 
                 {{-- Mobile menu button --}}
-                <button id="mobile-menu-btn" aria-label="Buka menu" aria-expanded="false" class="md:hidden p-2 border-2 border-ink-900 bg-paper-50 text-ink-900 hover:bg-ink-900 hover:text-flag-500">
+                <button id="mobile-menu-btn" aria-label="Buka menu" aria-expanded="false" class="md:hidden p-2 border-2 border-ink-900 bg-paper-50 text-ink-900 hover:bg-ink-900 hover:text-flag-500 transition duration-300 ease-in-out">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>

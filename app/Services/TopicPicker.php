@@ -6,7 +6,10 @@ use App\Models\ArticleGenerationLog;
 use App\Models\ArticlePool;
 use App\Models\ArticleTopic;
 use App\Services\ArticleGeneration\ContentProfile;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Pilih topik aktif berbobot untuk satu kali run generator.
@@ -87,18 +90,47 @@ class TopicPicker
             return $topics;
         }
 
-        return $topics->filter(function (ArticleTopic $t) use ($hours): bool {
-            $lastLog = $t->generationLogs()
-                ->where('status', 'completed')
-                ->latest()
-                ->first();
+        $cutoff = CarbonImmutable::now()->subHours(max(1, $hours));
 
-            if (! $lastLog) {
-                return true;
+        $recent = ArticleGenerationLog::query()
+            ->select('article_topic_id', DB::raw('MAX(created_at) as last_completed_at'))
+            ->where('status', 'completed')
+            ->whereNotNull('article_topic_id')
+            ->where('created_at', '>=', $cutoff)
+            ->groupBy('article_topic_id')
+            ->get();
+
+        foreach ($recent as $row) {
+            $topicId = (int) $row->article_topic_id;
+            if ($topicId <= 0) {
+                continue;
             }
 
-            return $lastLog->created_at->diffInHours(now()) >= $hours;
+            $last = $row->last_completed_at ? CarbonImmutable::parse($row->last_completed_at) : null;
+            if (! $last) {
+                continue;
+            }
+
+            $until = $last->addHours($hours);
+            $remaining = CarbonImmutable::now()->diffInSeconds($until, false);
+            if ($remaining > 0) {
+                Cache::put($this->cooldownCacheKey($topicId), 1, $remaining);
+            }
+        }
+
+        return $topics->reject(function (ArticleTopic $t): bool {
+            $id = (int) $t->getKey();
+            if ($id <= 0) {
+                return false;
+            }
+
+            return Cache::has($this->cooldownCacheKey($id));
         });
+    }
+
+    private function cooldownCacheKey(int $topicId): string
+    {
+        return "ai_article_topic:cooldown:{$topicId}";
     }
 
     /**

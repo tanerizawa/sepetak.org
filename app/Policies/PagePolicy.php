@@ -14,11 +14,11 @@ class PagePolicy extends BaseResourcePolicy
 
     public function update(\App\Models\User $user, \Illuminate\Database\Eloquent\Model $record): bool
     {
-        return $user->hasAnyRole(['superadmin', 'admin']) || $record->author_id === $user->id;
+        return parent::update($user, $record);
     }
 
     public function delete(\App\Models\User $user, \Illuminate\Database\Eloquent\Model $record): bool
     {
-        return $user->hasAnyRole(['superadmin', 'admin']) || $record->author_id === $user->id;
+        return parent::delete($user, $record);
     }
 }

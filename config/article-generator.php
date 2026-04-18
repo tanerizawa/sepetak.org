@@ -18,6 +18,7 @@ return [
     'openrouter' => [
         'base_url' => env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),
         'api_key' => env('OPENROUTER_API_KEY'),
+        'key_rotated_at' => env('OPENROUTER_API_KEY_ROTATED_AT'),
         // Slug utama; alias lama seperti anthropic/claude-3.5-sonnet sering "No endpoints found" di OpenRouter.
         'model' => env('OPENROUTER_MODEL', 'anthropic/claude-3.7-sonnet'),
         // Satu percobaan ulang otomatis bila pesan error mengandung "no endpoints found" (routing / kebijakan data).
@@ -26,6 +27,18 @@ return [
         'max_tokens' => (int) env('OPENROUTER_MAX_TOKENS', 8000),
         'referer' => env('APP_URL', 'https://sepetak.org'),
         'app_title' => env('APP_NAME', 'SEPETAK'),
+        'retry' => [
+            'attempts' => (int) env('OPENROUTER_RETRY_ATTEMPTS', 2),
+            'base_sleep_ms' => (int) env('OPENROUTER_RETRY_BASE_SLEEP_MS', 350),
+            'max_sleep_ms' => (int) env('OPENROUTER_RETRY_MAX_SLEEP_MS', 4000),
+        ],
+        'circuit_breaker' => [
+            'enabled' => (bool) env('OPENROUTER_CIRCUIT_BREAKER_ENABLED', true),
+            'failure_threshold' => (int) env('OPENROUTER_CIRCUIT_FAILURE_THRESHOLD', 3),
+            'window_seconds' => (int) env('OPENROUTER_CIRCUIT_WINDOW_SECONDS', 60),
+            'open_seconds' => (int) env('OPENROUTER_CIRCUIT_OPEN_SECONDS', 300),
+            'cache_key_prefix' => env('OPENROUTER_CIRCUIT_CACHE_KEY_PREFIX', 'openrouter:circuit'),
+        ],
     ],
 
     /*
@@ -65,7 +78,7 @@ return [
         'api_key' => env('PEXELS_API_KEY'),
     ],
     'image_provider_order' => array_values(array_filter(array_map(
-        fn ($v) => trim($v),
+        fn($v) => trim($v),
         explode(',', (string) env('ARTICLE_IMAGE_PROVIDER_ORDER', 'wikimedia,pexels,unsplash'))
     ))),
 
@@ -106,6 +119,8 @@ return [
     'member_practical_category_slugs' => [
         'panduan-tips-anggota',
     ],
+
+    'prompt_template_max_chars' => (int) env('ARTICLE_PROMPT_TEMPLATE_MAX_CHARS', 5000),
 
     /*
     |--------------------------------------------------------------------------
@@ -152,4 +167,30 @@ return [
     |
     */
     'topic_cooldown_hours' => (int) env('ARTICLE_TOPIC_COOLDOWN_HOURS', 0),
+
+    'quality' => [
+        'readability' => [
+            'enabled' => (bool) env('ARTICLE_READABILITY_ENABLED', true),
+            'min_score' => (int) env('ARTICLE_READABILITY_MIN_SCORE', 0),
+        ],
+        'plagiarism' => [
+            'enabled' => (bool) env('ARTICLE_PLAGIARISM_ENABLED', true),
+            'max_similarity' => (float) env('ARTICLE_PLAGIARISM_MAX_SIMILARITY', 0.35),
+            'candidate_limit' => (int) env('ARTICLE_PLAGIARISM_CANDIDATE_LIMIT', 200),
+            'lookback_days' => (int) env('ARTICLE_PLAGIARISM_LOOKBACK_DAYS', 730),
+        ],
+    ],
+
+    'prompt_variants' => [
+        'pillar' => [
+            'enabled' => (bool) env('ARTICLE_PROMPT_VARIANTS_PILLAR', false),
+            'selection' => env('ARTICLE_PROMPT_VARIANT_SELECTION', 'topic_id_mod'),
+            'variants' => [],
+        ],
+        'member_practical' => [
+            'enabled' => (bool) env('ARTICLE_PROMPT_VARIANTS_MEMBER_PRACTICAL', false),
+            'selection' => env('ARTICLE_PROMPT_VARIANT_SELECTION', 'topic_id_mod'),
+            'variants' => [],
+        ],
+    ],
 ];
