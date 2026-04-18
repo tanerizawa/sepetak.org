@@ -44,6 +44,7 @@ class Member extends Model implements HasMedia
             'joined_at' => 'date',
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',
+            'nik' => 'encrypted',
         ];
     }
 
@@ -51,7 +52,11 @@ class Member extends Model implements HasMedia
     {
         static::creating(function (self $member): void {
             if (empty($member->member_code)) {
-                $member->member_code = 'ANG-'.strtoupper(Str::random(10));
+                do {
+                    $code = 'ANG-'.strtoupper(Str::random(10));
+                } while (self::where('member_code', $code)->exists());
+                
+                $member->member_code = $code;
             }
         });
     }

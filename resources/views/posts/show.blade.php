@@ -5,6 +5,7 @@
 @section('og_type', 'article')
 @section('og_title', $post->title)
 @section('og_description', $post->excerpt ?: Str::limit(strip_tags($post->body), 200))
+@section('og_image', $post->getFirstMediaUrl('cover') ?: asset('img/logo/logo-512.png'))
 
 @push('head')
     @include('partials.jsonld.news-article', ['post' => $post])

@@ -199,6 +199,13 @@
       0 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
     ),
   ),
+  'spatie/laravel-honeypot' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\Honeypot\\HoneypotServiceProvider',
+    ),
+  ),
   'spatie/laravel-medialibrary' => 
   array (
     'providers' => 

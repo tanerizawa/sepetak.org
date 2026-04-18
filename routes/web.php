@@ -25,7 +25,9 @@ Route::get('/kontak', [ContactController::class, 'show'])->name('contact.show');
 Route::get('/halaman/{slug}', [PageController::class, 'show'])->name('pages.show');
 
 Route::get('/daftar-anggota', [MemberRegistrationController::class, 'create'])->name('member-registration.create');
-Route::post('/daftar-anggota', [MemberRegistrationController::class, 'store'])->name('member-registration.store');
+Route::post('/daftar-anggota', [MemberRegistrationController::class, 'store'])
+    ->middleware(\Spatie\Honeypot\ProtectAgainstSpam::class)
+    ->name('member-registration.store');
 
 Route::permanentRedirect('/berita', '/artikel');
 Route::permanentRedirect('/berita/{slug}', '/artikel/{slug}');
@@ -108,6 +110,10 @@ Route::middleware(['web', 'auth'])
     ->prefix('admin/exports')
     ->name('admin.exports.')
     ->group(function (): void {
-        Route::get('members.pdf', [ExportController::class, 'membersPdf'])->name('members.pdf');
-        Route::get('agrarian-cases.pdf', [ExportController::class, 'agrarianCasesPdf'])->name('agrarian-cases.pdf');
+        Route::get('members.pdf', [ExportController::class, 'membersPdf'])
+            ->middleware('can:manage-members')
+            ->name('members.pdf');
+        Route::get('agrarian-cases.pdf', [ExportController::class, 'agrarianCasesPdf'])
+            ->middleware('can:manage-cases')
+            ->name('agrarian-cases.pdf');
     });
