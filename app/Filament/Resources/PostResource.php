@@ -83,6 +83,27 @@ class PostResource extends Resource
                         ->relationship('author', 'name')
                         ->searchable()
                         ->preload(),
+
+                    Forms\Components\Select::make('categories')
+                        ->label('Kategori')
+                        ->relationship('categories', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable(),
+
+                    Forms\Components\Select::make('tags')
+                        ->label('Tag')
+                        ->relationship('tags', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable()
+                        ->createOptionForm([
+                            Forms\Components\TextInput::make('name')->required(),
+                        ]),
+
+                    Forms\Components\Toggle::make('ai_disclosure')
+                        ->label('Artikel AI')
+                        ->default(false),
                 ])
                 ->columns(2),
         ]);

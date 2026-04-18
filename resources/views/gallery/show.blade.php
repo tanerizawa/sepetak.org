@@ -60,19 +60,20 @@
             </h2>
             <div class="gallery-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach($photos as $idx => $item)
-                    @php($photoUrl = $item->getFirstMediaUrl('gallery_photo'))
-                    @if($photoUrl)
+                    @php($thumbUrl = $item->getFirstMediaUrl('gallery_photo', 'thumb') ?: $item->getFirstMediaUrl('gallery_photo'))
+                    @php($fullUrl = $item->getFirstMediaUrl('gallery_photo', 'preview') ?: $item->getFirstMediaUrl('gallery_photo'))
+                    @if($thumbUrl)
                     <button
                         type="button"
                         class="gallery-thumb card-poster group block overflow-hidden cursor-pointer aspect-square"
                         data-lightbox-index="{{ $idx }}"
-                        data-lightbox-src="{{ $photoUrl }}"
+                        data-lightbox-src="{{ $fullUrl }}"
                         data-lightbox-caption="{{ $item->caption ?? $item->title ?? '' }}"
                         data-lightbox-credit="{{ $item->credit ?? '' }}"
                     >
                         <div class="relative w-full h-full">
                             <img
-                                src="{{ $photoUrl }}"
+                                src="{{ $thumbUrl }}"
                                 alt="{{ $item->title ?? $album->title }}"
                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                                 loading="lazy"
@@ -152,7 +153,7 @@
 
         {{-- Back link --}}
         <div class="mt-16 pt-8 border-t-4 border-ink-900">
-            <a href="{{ route('gallery.index') }}" class="btn-rev btn-rev-outline inline-flex items-center gap-2">
+            <a href="{{ route('gallery.index') }}" class="btn-rev btn-rev-ghost inline-flex items-center gap-2">
                 <x-rev.icon name="arrow-left" size="16"/>
                 Kembali ke Galeri
             </a>

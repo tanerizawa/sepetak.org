@@ -87,6 +87,7 @@
 
         <form action="{{ route('member-registration.store') }}" method="POST" class="bg-paper-50 border-4 border-ink-900 shadow-poster p-6 sm:p-10 space-y-10">
             @csrf
+            @honeypot
 
             {{-- Data Pribadi --}}
             <fieldset>

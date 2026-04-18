@@ -19,7 +19,7 @@
     <meta property="og:description" content="@yield('og_description', $__env->yieldContent('meta_description', \App\Models\SiteSetting::getValue('site_description', 'SEPETAK - Serikat Pekerja Tani Karawang')))">
     <meta property="og:locale" content="id_ID">
     @php($logoV = config('sepetak.logo_asset_version', '3'))
-    <meta property="og:image" content="{{ asset('img/logo/logo-512.png') }}?v={{ $logoV }}">
+    <meta property="og:image" content="@yield('og_image', asset('img/logo/logo-512.png') . '?v=' . $logoV)">
     <meta property="og:image:alt" content="Logo SEPETAK — Serikat Pekerja Tani Karawang">
 
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/logo/logo-32.png') }}?v={{ $logoV }}">
@@ -86,12 +86,14 @@
                 </a>
 
                 {{-- Desktop Nav --}}
-                <div class="hidden md:flex items-center gap-7">
+                <div class="hidden md:flex items-center gap-4 xl:gap-7">
                     <a href="{{ route('beranda') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Beranda</a>
                     <a href="{{ route('posts.index') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Artikel</a>
                     <a href="{{ route('pages.show', 'tentang-kami') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Tentang</a>
                     <a href="{{ route('pages.show', 'sejarah') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Sejarah</a>
                     <a href="{{ route('pages.show', 'struktur-organisasi') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Struktur</a>
+                    <a href="{{ route('pages.show', 'wilayah-kerja') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Wilayah</a>
+                    <a href="{{ route('contact.show') }}" class="font-display uppercase tracking-widest text-sm text-ink-900 hover:text-flag-600 border-b-2 border-transparent hover:border-flag-500 pb-1 transition-colors">Kontak</a>
                     <x-rev.btn :href="route('member-registration.create')" variant="red" class="!py-2.5 !px-5 text-xs">
                         Daftar Anggota
                         <x-rev.icon name="arrow-right" size="16"/>

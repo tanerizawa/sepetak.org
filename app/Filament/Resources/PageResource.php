@@ -71,6 +71,17 @@ class PageResource extends Resource
 
                     Forms\Components\DateTimePicker::make('published_at')
                         ->label('Tanggal Publikasi'),
+
+                    Forms\Components\Select::make('author_id')
+                        ->label('Penulis')
+                        ->relationship('author', 'name')
+                        ->searchable()
+                        ->preload(),
+
+                    Forms\Components\Textarea::make('meta_description')
+                        ->label('Meta Description')
+                        ->rows(3)
+                        ->columnSpanFull(),
                 ])
                 ->columns(2),
         ]);
