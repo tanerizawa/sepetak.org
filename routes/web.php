@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('beranda');
 
 Route::get('/halaman/{slug}', [PageController::class, 'show'])->name('pages.show');
+Route::get('/halaman/kontak', [PageController::class, 'show'])->defaults('slug', 'kontak')->name('contact.show');
 
 Route::get('/daftar-anggota', [MemberRegistrationController::class, 'create'])->name('member-registration.create');
 Route::post('/daftar-anggota', [MemberRegistrationController::class, 'store'])->name('member-registration.store');
