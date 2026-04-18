@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin
+Disallow: /livewire
+
+Sitemap: https://sepetak.org/sitemap.xml

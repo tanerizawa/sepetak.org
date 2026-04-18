@@ -1,0 +1,30 @@
+# =============================================================================
+# /etc/cron.d/sepetak
+# -----------------------------------------------------------------------------
+# Cron sistem untuk domain sepetak.org:
+#   1. Laravel scheduler (setiap menit) — dipanggil oleh `php artisan schedule:run`.
+#      Meskipun aplikasi saat ini belum mendaftarkan scheduled task berat, ini
+#      aman berjalan dan menjadi infrastruktur siap-pakai untuk digest harian
+#      dsb.
+#   2. Backup harian jam 02:15 UTC (sekitar 09:15 WIB).
+#   3. Pembersihan session Laravel (rotasi minggu sekali).
+#
+# Instalasi:
+#   sudo cp ops/cron/sepetak /etc/cron.d/sepetak
+#   sudo chmod 644 /etc/cron.d/sepetak
+#   sudo systemctl restart cron
+#
+# Format: 5 kolom waktu + user + command. Wajib diakhiri newline.
+# =============================================================================
+
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+SHELL=/bin/bash
+
+# Laravel scheduler
+* * * * * www-data cd /var/www/sepetak.org/current && php artisan schedule:run >> /var/log/sepetak-scheduler.log 2>&1
+
+# Backup harian DB + storage (UTC 02:15 → WIB 09:15)
+15 2 * * * deploy  /var/www/sepetak.org/current/scripts/backup.sh >> /var/log/sepetak-backup.log 2>&1
+
+# Cleanup framework cache lama yang lolos dari pembersih Laravel (mingguan, Minggu 03:30 UTC)
+30 3 * * 0 www-data find /var/www/sepetak.org/shared/storage/framework/{cache,sessions,views} -type f -mtime +14 -delete 2>/dev/null

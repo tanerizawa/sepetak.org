@@ -1,0 +1,645 @@
+/* Urutan @import mengikuti spesifikasi CSS: semua @import harus di atas
+   sebelum rule lain. Google Fonts didaftarkan pertama, kemudian base theme
+   Filament, kemudian konfigurasi Tailwind. */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+/* =============================================================================
+   Admin Panel — Tema "Tani Merah"
+   Referensi: docs/LANDING_REDESIGN_PLAN.md §5 (palet + tipografi).
+   Prinsip kerja admin:
+     - Tipografi Anton hanya untuk branding & judul halaman, tidak untuk data.
+     - Body pakai Work Sans agar tabel/form tetap legible.
+     - Radius kecil (2px) + shadow tajam menggantikan gaya korporat Filament
+       default, tanpa mengorbankan density.
+     - Dark mode mengadaptasi palet ink/paper yang sama dengan situs publik.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. Tipografi global
+   -------------------------------------------------------------------------- */
+.fi-body,
+.fi-layout,
+body {
+    font-family: 'Work Sans', Inter, ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
+}
+
+.fi-topbar,
+.fi-sidebar,
+.fi-main {
+    letter-spacing: 0.005em;
+}
+
+/* Brand name di sidebar/topbar — Anton uppercase, sesuai poster. */
+.fi-logo {
+    font-family: 'Anton', 'Archivo Black', Impact, sans-serif !important;
+    font-size: 1.35rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: rgb(13 13 13) !important;
+}
+
+.dark .fi-logo {
+    color: rgb(252 249 241) !important;
+}
+
+/* Judul halaman (Page::getTitle()) — aksen display. */
+.fi-header-heading,
+.fi-page-header-heading,
+h1.fi-header-heading,
+.fi-section-header-heading {
+    font-family: 'Anton', 'Archivo Black', Impact, sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-weight: 400;
+}
+
+/* Subheading tetap Work Sans agar paragraf readable. */
+.fi-header-subheading,
+.fi-section-header-description {
+    font-family: 'Work Sans', sans-serif;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    font-weight: 400;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Token warna — override variabel Filament dengan palet Tani Merah
+   -------------------------------------------------------------------------- */
+:root {
+    /* Background utama = paper-50, memberi kesan kertas (consistent w/ site). */
+    --fi-page-background: 252 249 241; /* #FCF9F1 */
+
+    /* Text utama = ink-900. */
+    --fi-text: 13 13 13; /* #0D0D0D */
+
+    /* Border default lebih tegas (poster vibe). */
+    --fi-border: 209 200 148; /* paper-300 */
+}
+
+.dark {
+    --fi-page-background: 13 13 13;
+    --fi-text: 245 245 245;
+    --fi-border: 43 43 43;
+}
+
+/* -----------------------------------------------------------------------------
+   3. Topbar — strip merah tipis seperti site publik
+   -------------------------------------------------------------------------- */
+.fi-topbar > nav {
+    border-bottom: 3px solid rgb(13 13 13) !important;
+    box-shadow: 0 4px 0 rgb(200 16 46) !important; /* garis merah tebal */
+    background-color: rgb(252 249 241) !important;
+}
+
+.dark .fi-topbar > nav {
+    background-color: rgb(13 13 13) !important;
+    border-bottom-color: rgb(200 16 46) !important;
+    box-shadow: 0 4px 0 rgb(13 13 13) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   4. Sidebar — poster flavor, border tebal
+   -------------------------------------------------------------------------
+   Catatan redesign:
+   - Menghindari background merah pekat pada item aktif karena Filament
+     tetap merender <span class="text-primary-600"> untuk label, yang
+     membuat teks merah tua di atas merah terang nyaris hilang.
+   - Solusi: latar pucat (flag-50), teks & ikon sama-sama flag-700 —
+     kontras AAA, dan teks selalu mengikuti warna ikon di sebelahnya,
+     baik saat hover maupun aktif.
+   - Pembeda aktif vs hover: aksen bar merah di sisi kiri + bold. -------------------------------------------------------------------------- */
+.fi-sidebar {
+    border-right: 3px solid rgb(13 13 13) !important;
+    background-color: rgb(252 249 241) !important;
+}
+
+.dark .fi-sidebar {
+    background-color: rgb(13 13 13) !important;
+    border-right-color: rgb(200 16 46) !important;
+}
+
+.fi-sidebar-group-label {
+    font-family: 'Space Mono', ui-monospace, monospace !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase !important;
+    color: rgb(133 133 133) !important;
+}
+
+/* Semua item dapat bar kiri transparan 4px agar transisi ke aktif tidak
+   menggeser tata letak. */
+.fi-sidebar-item .fi-sidebar-item-button {
+    border-left: 4px solid transparent !important;
+    border-radius: 0 !important;
+}
+
+/* Hover (item non-aktif yang di-hover) — soft tint merah,
+   teks & ikon sama-sama flag-600. */
+.fi-sidebar-item .fi-sidebar-item-button:hover,
+.fi-sidebar-item .fi-sidebar-item-button:focus-visible {
+    background-color: rgb(255 242 243) !important; /* flag-50 */
+}
+
+.fi-sidebar-item .fi-sidebar-item-button:hover .fi-sidebar-item-icon,
+.fi-sidebar-item .fi-sidebar-item-button:focus-visible .fi-sidebar-item-icon,
+.fi-sidebar-item .fi-sidebar-item-button:hover .fi-sidebar-item-label,
+.fi-sidebar-item .fi-sidebar-item-button:focus-visible .fi-sidebar-item-label {
+    color: rgb(165 11 37) !important; /* flag-600 */
+}
+
+.dark .fi-sidebar-item .fi-sidebar-item-button:hover,
+.dark .fi-sidebar-item .fi-sidebar-item-button:focus-visible {
+    background-color: rgba(200, 16, 46, 0.18) !important;
+}
+
+.dark .fi-sidebar-item .fi-sidebar-item-button:hover .fi-sidebar-item-icon,
+.dark .fi-sidebar-item .fi-sidebar-item-button:focus-visible .fi-sidebar-item-icon,
+.dark .fi-sidebar-item .fi-sidebar-item-button:hover .fi-sidebar-item-label,
+.dark .fi-sidebar-item .fi-sidebar-item-button:focus-visible .fi-sidebar-item-label {
+    color: rgb(240 113 123) !important; /* flag-300 */
+}
+
+/* Aktif — bar merah kiri + teks/ikon flag-700, latar flag-50. */
+.fi-sidebar-item-active .fi-sidebar-item-button,
+.fi-sidebar-item-button[aria-current="page"] {
+    background-color: rgb(255 242 243) !important; /* flag-50 */
+    border-left-color: rgb(200 16 46) !important; /* flag-500, swap dari transparan */
+    font-weight: 600;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-icon,
+.fi-sidebar-item-button[aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item-active .fi-sidebar-item-label,
+.fi-sidebar-item-button[aria-current="page"] .fi-sidebar-item-label {
+    color: rgb(126 10 30) !important; /* flag-700 */
+}
+
+.dark .fi-sidebar-item-active .fi-sidebar-item-button,
+.dark .fi-sidebar-item-button[aria-current="page"] {
+    background-color: rgba(200, 16, 46, 0.22) !important;
+    border-left-color: rgb(200 16 46) !important;
+}
+
+.dark .fi-sidebar-item-active .fi-sidebar-item-icon,
+.dark .fi-sidebar-item-button[aria-current="page"] .fi-sidebar-item-icon,
+.dark .fi-sidebar-item-active .fi-sidebar-item-label,
+.dark .fi-sidebar-item-button[aria-current="page"] .fi-sidebar-item-label {
+    color: rgb(250 167 174) !important; /* flag-200 */
+}
+
+/* -----------------------------------------------------------------------------
+   5. Tombol — poster style, offset shadow sharp
+   -------------------------------------------------------------------------- */
+.fi-btn-color-primary,
+.fi-btn-color-primary:not(:disabled):not(.fi-disabled) {
+    background-color: rgb(200 16 46) !important;
+    color: rgb(252 249 241) !important;
+    border: 2px solid rgb(13 13 13) !important;
+    border-radius: 0 !important;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.fi-btn-color-primary:hover:not(:disabled):not(.fi-disabled) {
+    background-color: rgb(165 11 37) !important; /* flag-600 */
+    box-shadow: 4px 4px 0 rgb(13 13 13);
+    transform: translate(-2px, -2px);
+}
+
+.fi-btn-color-primary:active:not(:disabled):not(.fi-disabled) {
+    transform: translate(0, 0);
+    box-shadow: 1px 1px 0 rgb(13 13 13);
+}
+
+.fi-btn-color-danger:not(:disabled):not(.fi-disabled) {
+    background-color: rgb(13 13 13) !important;
+    color: rgb(252 249 241) !important;
+    border: 2px solid rgb(200 16 46) !important;
+    border-radius: 0 !important;
+}
+
+.fi-btn-color-danger:hover:not(:disabled):not(.fi-disabled) {
+    background-color: rgb(200 16 46) !important;
+    border-color: rgb(13 13 13) !important;
+}
+
+/* Secondary/gray buttons — tetap clean, tapi tajam. */
+.fi-btn-color-gray:not(:disabled):not(.fi-disabled) {
+    border-radius: 0 !important;
+    border: 2px solid rgb(13 13 13) !important;
+}
+
+/* Buttons status-semantik lain (success/warning/info) — ikuti pola outline
+   tajam yang sama agar header actions & bulk actions tidak "bulat-lunak"
+   berdiri sendirian di tengah UI tanpa-radius. Warna teks tetap warna
+   Filament bawaan (solid), hanya radius & border yang diseragamkan. */
+.fi-btn-color-success:not(:disabled):not(.fi-disabled),
+.fi-btn-color-warning:not(:disabled):not(.fi-disabled),
+.fi-btn-color-info:not(:disabled):not(.fi-disabled) {
+    border-radius: 0 !important;
+}
+
+.fi-btn-color-success.fi-outlined:not(:disabled):not(.fi-disabled) {
+    border: 2px solid rgb(4 120 87) !important; /* emerald-700 */
+}
+
+.fi-btn-color-warning.fi-outlined:not(:disabled):not(.fi-disabled) {
+    border: 2px solid rgb(161 98 7) !important; /* amber-700 */
+}
+
+.fi-btn-color-info.fi-outlined:not(:disabled):not(.fi-disabled) {
+    border: 2px solid rgb(3 105 161) !important; /* sky-700 */
+}
+
+/* Link-style buttons (ViewAction/EditAction/DeleteAction di row) — jaga
+   agar ikon tidak terpotong oleh border radius global. */
+.fi-ta-actions .fi-link,
+.fi-ta-actions .fi-ac-link-action {
+    border-radius: 0 !important;
+}
+
+/* -----------------------------------------------------------------------------
+   6. Card/section/table — sudut sharp, border tebal selektif
+   -------------------------------------------------------------------------- */
+.fi-section,
+.fi-page .fi-wi,
+.fi-ta,
+.fi-in {
+    border-radius: 0 !important;
+}
+
+.fi-section {
+    border: 2px solid rgb(209 200 148); /* paper-300 */
+    box-shadow: 4px 4px 0 rgba(13, 13, 13, 0.08);
+}
+
+.dark .fi-section {
+    border-color: rgb(43 43 43);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+}
+
+.fi-section-header {
+    border-bottom: 2px solid rgb(209 200 148);
+}
+
+.dark .fi-section-header {
+    border-bottom-color: rgb(43 43 43);
+}
+
+/* Tabel — row hover tegas, header monospace kecil. */
+.fi-ta-header-cell {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(43 43 43);
+}
+
+.dark .fi-ta-header-cell {
+    color: rgb(184 184 184);
+}
+
+.fi-ta-row:hover {
+    background-color: rgba(200, 16, 46, 0.04);
+}
+
+.dark .fi-ta-row:hover {
+    background-color: rgba(200, 16, 46, 0.1);
+}
+
+/* -----------------------------------------------------------------------------
+   7. Input & form — border tebal, focus ring merah
+   -------------------------------------------------------------------------- */
+.fi-input,
+.fi-select-input,
+.fi-textarea,
+.fi-fo-field-wrp input,
+.fi-fo-field-wrp select,
+.fi-fo-field-wrp textarea {
+    border-radius: 0 !important;
+    border: 2px solid rgb(43 43 43) !important;
+    transition: box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.fi-input:focus-within,
+.fi-select:focus-within,
+.fi-textarea:focus-within,
+.fi-fo-field-wrp input:focus,
+.fi-fo-field-wrp select:focus,
+.fi-fo-field-wrp textarea:focus {
+    border-color: rgb(200 16 46) !important;
+    box-shadow: 3px 3px 0 rgb(200 16 46) !important;
+    outline: none !important;
+}
+
+/* -----------------------------------------------------------------------------
+   8. Badge — uppercase compact, warna solid bukan soft
+   -------------------------------------------------------------------------- */
+.fi-badge {
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    font-size: 0.68rem;
+    border: 1.5px solid currentColor;
+    padding: 0.15rem 0.5rem !important;
+}
+
+/* -----------------------------------------------------------------------------
+   9. Dashboard widgets — statistik stempel besar ala poster
+   -------------------------------------------------------------------------- */
+.fi-wi-stats-overview-stat {
+    border-radius: 0 !important;
+    border: 2px solid rgb(13 13 13);
+    box-shadow: 4px 4px 0 rgba(200, 16, 46, 0.2);
+    background-color: rgb(252 249 241);
+}
+
+.dark .fi-wi-stats-overview-stat {
+    background-color: rgb(26 26 26);
+    border-color: rgb(200 16 46);
+    box-shadow: 4px 4px 0 rgba(200, 16, 46, 0.35);
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-family: 'Anton', 'Archivo Black', Impact, sans-serif !important;
+    font-size: 2.75rem !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1 !important;
+    color: rgb(13 13 13);
+}
+
+.dark .fi-wi-stats-overview-stat-value {
+    color: rgb(252 249 241);
+}
+
+.fi-wi-stats-overview-stat-label {
+    font-family: 'Space Mono', ui-monospace, monospace !important;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+}
+
+/* -----------------------------------------------------------------------------
+   10. Login — layout dibungkus tersendiri di partial login blade
+   -------------------------------------------------------------------------- */
+.sepetak-login-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    background-color: rgb(252 249 241);
+}
+
+@media (min-width: 1024px) {
+    .sepetak-login-shell {
+        grid-template-columns: 1fr 1.2fr;
+    }
+}
+
+.sepetak-login-poster {
+    background-color: rgb(200 16 46);
+    color: rgb(252 249 241);
+    position: relative;
+    overflow: hidden;
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 18rem;
+    border-bottom: 4px solid rgb(13 13 13);
+}
+
+@media (min-width: 1024px) {
+    .sepetak-login-poster {
+        border-bottom: 0;
+        border-right: 4px solid rgb(13 13 13);
+        padding: 4rem 3.5rem;
+    }
+}
+
+.sepetak-login-poster::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        repeating-linear-gradient(
+            135deg,
+            transparent 0 18px,
+            rgba(13, 13, 13, 0.06) 18px 19px
+        );
+    z-index: 0;
+}
+
+.sepetak-login-poster > * {
+    position: relative;
+    z-index: 1;
+}
+
+.sepetak-login-headline {
+    font-family: 'Anton', 'Archivo Black', Impact, sans-serif;
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: rgb(252 249 241);
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+}
+
+.sepetak-login-headline__line {
+    display: block;
+}
+
+/* Blok stempel — kontras tinggi (hitam/paper-50) dan mendukung multi-line
+   dengan box-decoration-break agar background tidak menyebar saat wrap. */
+.sepetak-login-headline__mark {
+    display: inline;
+    background-color: rgb(13 13 13);
+    color: rgb(252 249 241);
+    padding: 0.05em 0.32em 0.1em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    box-shadow: 0 0 0 2px rgb(13 13 13);
+    line-height: 1.05;
+}
+
+.sepetak-login-meta {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+}
+
+.sepetak-login-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+    .sepetak-login-form {
+        padding: 4rem 3rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .sepetak-login-form {
+        padding: 4rem 5rem;
+    }
+}
+
+.sepetak-login-form-card {
+    max-width: 26rem;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* -----------------------------------------------------------------------------
+   11. Dropdown, Modal, Pagination — sharp edges konsisten
+   -------------------------------------------------------------------------- */
+.fi-dropdown-panel,
+.fi-modal,
+.fi-modal-window,
+.fi-pagination,
+.fi-fieldset {
+    border-radius: 0 !important;
+}
+
+.fi-dropdown-panel {
+    border: 2px solid rgb(13 13 13) !important;
+    box-shadow: 4px 4px 0 rgba(13, 13, 13, 0.12) !important;
+}
+
+.dark .fi-dropdown-panel {
+    border-color: rgb(43 43 43) !important;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+.fi-modal-window {
+    border: 2px solid rgb(13 13 13) !important;
+    box-shadow: 8px 8px 0 rgba(200, 16, 46, 0.18) !important;
+}
+
+.dark .fi-modal-window {
+    border-color: rgb(200 16 46) !important;
+}
+
+/* Pagination item — bar mono, aktif pakai flag-50 + border flag-500 */
+.fi-pagination-item {
+    border-radius: 0 !important;
+}
+
+.fi-pagination-item[aria-current="page"] {
+    background-color: rgb(255 242 243) !important;
+    border: 2px solid rgb(200 16 46) !important;
+    color: rgb(126 10 30) !important;
+    font-weight: 700;
+}
+
+.dark .fi-pagination-item[aria-current="page"] {
+    background-color: rgba(200, 16, 46, 0.25) !important;
+    color: rgb(250 167 174) !important;
+}
+
+/* Fieldset & Tabs — garis tegas, header monospace kecil */
+.fi-fieldset {
+    border: 2px solid rgb(209 200 148) !important;
+}
+
+.dark .fi-fieldset {
+    border-color: rgb(43 43 43) !important;
+}
+
+.fi-fieldset-label {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.fi-tabs {
+    border-radius: 0 !important;
+    border: 2px solid rgb(209 200 148) !important;
+}
+
+.dark .fi-tabs {
+    border-color: rgb(43 43 43) !important;
+}
+
+.fi-tabs-item {
+    border-radius: 0 !important;
+}
+
+.fi-tabs-item[aria-selected="true"] {
+    background-color: rgb(255 242 243) !important;
+    color: rgb(126 10 30) !important;
+    font-weight: 600;
+}
+
+.dark .fi-tabs-item[aria-selected="true"] {
+    background-color: rgba(200, 16, 46, 0.18) !important;
+    color: rgb(250 167 174) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   12. User menu & Global search — selaras dengan topbar
+   -------------------------------------------------------------------------- */
+.fi-user-menu .fi-dropdown-trigger-button {
+    border-radius: 0 !important;
+}
+
+.fi-global-search-field input {
+    border-radius: 0 !important;
+    border: 2px solid rgb(43 43 43) !important;
+}
+
+.fi-global-search-field input:focus {
+    border-color: rgb(200 16 46) !important;
+    box-shadow: 3px 3px 0 rgb(200 16 46) !important;
+    outline: none !important;
+}
+
+/* -----------------------------------------------------------------------------
+   13. Body background — pastikan paper-50 di light, ink-900 di dark
+        (menambal kasus ketika user agent memaksa default bg-white)
+   -------------------------------------------------------------------------- */
+body,
+.fi-body,
+.fi-main-ctn {
+    background-color: rgb(252 249 241) !important;
+}
+
+.dark body,
+.dark .fi-body,
+.dark .fi-main-ctn {
+    background-color: rgb(13 13 13) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   14. Login — focus ring field lebih terlihat di atas panel paper-50
+   -------------------------------------------------------------------------- */
+.sepetak-login-form input:focus,
+.sepetak-login-form textarea:focus {
+    outline: 2px solid rgb(200 16 46);
+    outline-offset: 2px;
+}
+
+/* Reduced-motion — nonaktifkan translate/scale kecil pada tombol primary
+   agar sesuai preferensi user (WCAG 2.3.3). */
+@media (prefers-reduced-motion: reduce) {
+    .fi-btn-color-primary:hover:not(:disabled):not(.fi-disabled) {
+        transform: none !important;
+    }
+    .fi-btn-color-primary:active:not(:disabled):not(.fi-disabled) {
+        box-shadow: none !important;
+    }
+}

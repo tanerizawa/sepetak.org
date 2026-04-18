@@ -1,0 +1,25 @@
+# WAHA — WhatsApp HTTP API untuk SEPETAK
+# Dokumentasi: https://waha.devlike.pro/docs/how-to/install/
+# Repositori: https://github.com/devlikeapro/waha
+#
+# Dari direktori ini:
+#   ./init-waha.sh          # sekali: menghasilkan .env (kunci API, dashboard)
+#   docker compose up -d    # menjalankan layanan
+#
+# Dashboard: http://localhost:${WAHA_PUBLISH_PORT:-3000}/dashboard
+# Swagger:   http://localhost:${WAHA_PUBLISH_PORT:-3000}/
+
+services:
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: sepetak-waha
+    restart: unless-stopped
+    # Hanya localhost: akses dari nginx/PHP di mesin yang sama, atau SSH tunnel.
+    # Untuk bind ke semua interface: set WAHA_PUBLISH_HOST=0.0.0.0
+    ports:
+      - "${WAHA_PUBLISH_HOST:-127.0.0.1}:${WAHA_PUBLISH_PORT:-3000}:3000"
+    env_file:
+      - .env
+    volumes:
+      # Persistensi sesi WhatsApp (QR, state) — jangan dihapus di produksi.
+      - ./sessions:/app/.sessions

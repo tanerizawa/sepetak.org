@@ -1,0 +1,6 @@
+.DS_Store
+
+# WAHA (kredensial + penyimpanan sesi WhatsApp)
+ops/waha/.env
+ops/waha/sessions/
+!ops/waha/.env.example

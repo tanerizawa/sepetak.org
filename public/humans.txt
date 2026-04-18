@@ -1,0 +1,19 @@
+/* TEAM */
+Organisasi: Serikat Pekerja Tani Karawang (SEPETAK)
+Situs: https://sepetak.org
+Kontak: info [at] sepetak.org
+Lokasi: Karawang, Jawa Barat, Indonesia
+
+/* SITE */
+Bahasa: Bahasa Indonesia (id)
+Didirikan: 2007-12-10
+Lisensi: Konten dilindungi hak cipta. Kode sumber proyek tertutup.
+Stack: Laravel 11, FilamentPHP 3, PostgreSQL, Redis, Tailwind CSS
+
+/* DESIGN SYSTEM */
+Nama: Tani Merah (Revolutionary Print)
+Palet: #C8102E (flag), #0D0D0D (ink), #FCF9F1 (paper)
+Tipografi: Anton, Work Sans, Space Mono, Roboto Slab
+
+/* DEDIKASI */
+Untuk seluruh petani dan nelayan pejuang keadilan agraria.
