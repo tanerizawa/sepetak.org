@@ -6,6 +6,69 @@
 
 @config 'tailwind.config.js';
 
+/* Token warna sama dengan resources/css/app.css — wajib di sini karena entry
+   Vite Filament terpisah; tanpa ini util Tailwind text-ink-*, text-flag-*,
+   border-paper-* di Blade login/split tidak punya variabel → kontras hancur. */
+@layer base {
+    :root {
+        --paper-50: 42 45% 96%;
+        --paper-100: 42 40% 93%;
+        --paper-200: 42 33% 88%;
+        --paper-300: 42 26% 80%;
+
+        --ink-900: 222 15% 12%;
+        --ink-800: 222 14% 18%;
+        --ink-700: 222 12% 28%;
+        --ink-200: 222 8% 78%;
+        --ink-100: 222 8% 88%;
+        --ink-50: 222 10% 96%;
+
+        --flag-50: 352 55% 96%;
+        --flag-100: 352 55% 92%;
+        --flag-200: 352 58% 85%;
+        --flag-300: 352 60% 74%;
+        --flag-400: 352 62% 58%;
+        --flag-500: 352 62% 45%;
+        --flag-600: 352 66% 38%;
+        --flag-700: 352 68% 30%;
+        --flag-800: 352 70% 24%;
+        --flag-900: 352 72% 16%;
+
+        --ochre-400: 38 70% 56%;
+        --ochre-500: 38 70% 48%;
+        --ochre-600: 38 70% 40%;
+        --ochre-700: 38 70% 32%;
+
+        --earth-500: 24 45% 34%;
+        --earth-600: 24 45% 26%;
+    }
+
+    .dark {
+        --paper-50: 222 15% 10%;
+        --paper-100: 222 14% 14%;
+        --paper-200: 222 12% 20%;
+        --paper-300: 222 10% 28%;
+
+        --ink-900: 42 45% 96%;
+        --ink-800: 42 40% 92%;
+        --ink-700: 42 33% 86%;
+        --ink-200: 222 10% 38%;
+        --ink-100: 222 8% 32%;
+        --ink-50: 222 8% 22%;
+
+        --flag-50: 352 40% 12%;
+        --flag-100: 352 42% 18%;
+        --flag-200: 352 45% 28%;
+        --flag-300: 352 48% 40%;
+        --flag-400: 352 52% 52%;
+        --flag-500: 352 58% 48%;
+        --flag-600: 352 60% 58%;
+        --flag-700: 352 62% 68%;
+        --flag-800: 352 58% 76%;
+        --flag-900: 352 55% 86%;
+    }
+}
+
 /* =============================================================================
    Admin Panel — Tema "Tani Merah"
    Referensi: docs/LANDING_REDESIGN_PLAN.md §5 (palet + tipografi).
@@ -455,7 +518,11 @@ h1.fi-header-heading,
     min-height: 100vh;
     display: grid;
     grid-template-columns: 1fr;
-    background-color: rgb(252 249 241);
+    background-color: hsl(var(--paper-50));
+}
+
+.dark .sepetak-login-shell {
+    background-color: hsl(var(--paper-50));
 }
 
 @media (min-width: 1024px) {
@@ -563,6 +630,93 @@ h1.fi-header-heading,
     max-width: 26rem;
     margin: 0 auto;
     width: 100%;
+}
+
+/* Kolom form: teks & field harus jelas di atas paper-50 (hindari abu-abu Filament tipis). */
+.sepetak-login-form,
+.sepetak-login-form .fi-simple-page {
+    color: hsl(var(--ink-900));
+}
+
+.dark .sepetak-login-form,
+.dark .sepetak-login-form .fi-simple-page {
+    color: hsl(var(--ink-900));
+}
+
+.sepetak-login-form .fi-fo-field-wrp-label,
+.sepetak-login-form .fi-fo-field-wrp-label span {
+    color: hsl(var(--ink-900)) !important;
+    font-weight: 600;
+}
+
+.sepetak-login-form .fi-fo-field-wrp-hint,
+.sepetak-login-form .fi-fo-field-wrp-helper-text {
+    color: hsl(var(--ink-700)) !important;
+}
+
+.dark .sepetak-login-form .fi-fo-field-wrp-hint,
+.dark .sepetak-login-form .fi-fo-field-wrp-helper-text {
+    color: hsl(var(--ink-700)) !important;
+}
+
+.sepetak-login-form .fi-input-wrp {
+    border-radius: 0 !important;
+    background-color: rgb(255 255 255) !important;
+    --tw-ring-color: rgb(55 55 55) !important;
+}
+
+.sepetak-login-form input.fi-input {
+    background-color: transparent !important;
+    color: hsl(var(--ink-900)) !important;
+    -webkit-text-fill-color: hsl(var(--ink-900)) !important;
+}
+
+.sepetak-login-form input.fi-input::placeholder {
+    color: hsl(var(--ink-700) / 0.72) !important;
+    -webkit-text-fill-color: hsl(var(--ink-700) / 0.72) !important;
+}
+
+.dark .sepetak-login-form .fi-input-wrp {
+    background-color: rgb(30 30 30) !important;
+    --tw-ring-color: hsl(var(--ink-200)) !important;
+}
+
+.dark .sepetak-login-form input.fi-input {
+    color: hsl(var(--ink-900)) !important;
+    -webkit-text-fill-color: hsl(var(--ink-900)) !important;
+}
+
+.dark .sepetak-login-form input.fi-input::placeholder {
+    color: hsl(var(--ink-700) / 0.85) !important;
+    -webkit-text-fill-color: hsl(var(--ink-700) / 0.85) !important;
+}
+
+.sepetak-login-form .fi-fo-checkbox label,
+.sepetak-login-form .fi-fo-checkbox .fi-fo-field-wrp-label,
+.sepetak-login-form label[for*="remember"] {
+    color: hsl(var(--ink-900)) !important;
+    font-weight: 500;
+}
+
+/* Aksi inline (tampilkan / sembunyikan sandi) */
+.sepetak-login-form .fi-input-wrp .fi-btn,
+.sepetak-login-form .fi-input-wrp button[type="button"] {
+    color: hsl(var(--flag-700)) !important;
+}
+
+.sepetak-login-form .fi-input-wrp .fi-btn:hover,
+.sepetak-login-form .fi-input-wrp button[type="button"]:hover {
+    color: hsl(var(--flag-600)) !important;
+}
+
+.dark .sepetak-login-form .fi-input-wrp .fi-btn,
+.dark .sepetak-login-form .fi-input-wrp button[type="button"] {
+    color: hsl(var(--flag-300)) !important;
+}
+
+.dark .sepetak-login-form .fi-input-wrp .fi-btn:hover,
+.dark .sepetak-login-form .fi-input-wrp button[type="button"]:hover {
+    color: hsl(var(--flag-200)) !important;
 }
 
 /* -----------------------------------------------------------------------------

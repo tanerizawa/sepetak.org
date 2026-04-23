@@ -6,15 +6,15 @@
     {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_PAGE_START, scopes: $this->getRenderHookScopes()) }}
 
     <div class="mb-8">
-        <div class="font-mono text-[0.7rem] uppercase tracking-widest text-flag-600 mb-3 flex items-center gap-3">
-            <span class="inline-block h-[3px] w-8 bg-flag-500"></span>
+        <div class="font-mono text-[0.7rem] uppercase tracking-widest text-flag-700 dark:text-flag-300 mb-3 flex items-center gap-3">
+            <span class="inline-block h-[3px] w-8 bg-flag-600 dark:bg-flag-500"></span>
             Masuk Sistem
         </div>
-        <h2 class="font-display text-4xl sm:text-5xl leading-[0.9] uppercase tracking-tight text-ink-900 dark:text-paper-50">
+        <h2 class="font-display text-4xl sm:text-5xl leading-[0.9] uppercase tracking-tight text-ink-900 dark:text-ink-900">
             Otentikasi<br>
-            <span class="text-flag-600">Pengurus.</span>
+            <span class="text-flag-600 dark:text-flag-400">Pengurus.</span>
         </h2>
-        <p class="mt-4 text-sm text-ink-700 dark:text-paper-200 leading-relaxed">
+        <p class="mt-4 text-sm text-ink-800 dark:text-ink-700 leading-relaxed max-w-prose">
             Gunakan email dan kata sandi yang telah diterbitkan sekretariat. Bila mengalami kendala akses, hubungi administrator panel.
         </p>
     </div>
@@ -37,9 +37,9 @@
 
     <x-filament-actions::modals />
 
-    <div class="mt-10 pt-6 border-t-2 border-ink-900/10 dark:border-paper-50/10 flex items-center justify-between text-[0.7rem] font-mono uppercase tracking-widest text-ink-700 dark:text-paper-200">
+    <div class="mt-10 pt-6 border-t-2 border-ink-900/20 dark:border-paper-300/25 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-[0.7rem] font-mono uppercase tracking-widest text-ink-800 dark:text-ink-700">
         <span>Serikat Pekerja Tani Karawang</span>
-        <a href="{{ url('/') }}" class="hover:text-flag-600 dark:hover:text-flag-400 hover:underline">← Kembali ke Situs</a>
+        <a href="{{ url('/') }}" class="text-flag-700 hover:text-flag-600 dark:text-flag-400 dark:hover:text-flag-300 underline-offset-2 hover:underline">← Kembali ke Situs</a>
     </div>
 
     {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_PAGE_END, scopes: $this->getRenderHookScopes()) }}

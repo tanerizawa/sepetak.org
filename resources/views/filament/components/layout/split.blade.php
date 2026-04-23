@@ -22,14 +22,14 @@
                         decoding="async"
                     >
                 </div>
-                <div class="leading-none">
-                    <div class="sepetak-login-meta">Panel Administrasi</div>
-                    <div class="font-display text-2xl uppercase tracking-[0.06em] mt-1">SEPETAK</div>
+                <div class="leading-none text-paper-50">
+                    <div class="sepetak-login-meta text-paper-50/95">Panel Administrasi</div>
+                    <div class="font-display text-2xl uppercase tracking-[0.06em] mt-1 text-paper-50">SEPETAK</div>
                 </div>
             </div>
 
             <div class="max-w-md">
-                <div class="sepetak-login-meta mb-4 flex items-center gap-3">
+                <div class="sepetak-login-meta mb-4 flex items-center gap-3 text-paper-50/95">
                     <span class="inline-block h-[3px] w-10 bg-paper-50"></span>
                     <span>Ruang Kerja Internal</span>
                 </div>
@@ -40,12 +40,12 @@
                     </span>
                     <span class="sepetak-login-headline__line">Karawang</span>
                 </h1>
-                <p class="mt-5 text-sm sm:text-base leading-relaxed text-paper-100 max-w-sm">
+                <p class="mt-5 text-sm sm:text-base leading-relaxed text-paper-50 max-w-sm [text-shadow:0_1px_2px_rgb(0_0_0_/_0.18)]">
                     Halaman ini diperuntukkan bagi pengurus dan sekretariat SEPETAK. Masuk menggunakan kredensial yang telah diterbitkan sekretariat untuk mengelola data anggota, kasus agraria, serta publikasi organisasi.
                 </p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-4 sepetak-login-meta">
+            <div class="flex flex-wrap items-center gap-4 sepetak-login-meta text-paper-50/95">
                 <span>Didirikan 2007</span>
                 <span aria-hidden="true" class="opacity-50">·</span>
                 <span>Kabupaten Karawang</span>
