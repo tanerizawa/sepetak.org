@@ -10,11 +10,11 @@
             <span class="inline-block h-[3px] w-8 bg-flag-600 dark:bg-flag-500"></span>
             Masuk Sistem
         </div>
-        <h2 class="font-display text-4xl sm:text-5xl leading-[0.9] uppercase tracking-tight text-ink-900 dark:text-ink-900">
+        <h2 class="font-display text-4xl sm:text-5xl leading-[0.9] uppercase tracking-tight text-ink-900">
             Otentikasi<br>
             <span class="text-flag-600 dark:text-flag-400">Pengurus.</span>
         </h2>
-        <p class="mt-4 text-sm text-ink-800 dark:text-ink-700 leading-relaxed max-w-prose">
+        <p class="mt-4 text-sm text-ink-800 leading-relaxed max-w-prose">
             Gunakan email dan kata sandi yang telah diterbitkan sekretariat. Bila mengalami kendala akses, hubungi administrator panel.
         </p>
     </div>
@@ -37,9 +37,9 @@
 
     <x-filament-actions::modals />
 
-    <div class="mt-10 pt-6 border-t-2 border-ink-900/20 dark:border-paper-300/25 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-[0.7rem] font-mono uppercase tracking-widest text-ink-800 dark:text-ink-700">
+    <div class="mt-10 pt-6 border-t-2 border-ink-900/20 dark:border-ink-200/30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-[0.7rem] font-mono uppercase tracking-widest text-ink-800">
         <span>Serikat Pekerja Tani Karawang</span>
-        <a href="{{ url('/') }}" class="text-flag-700 hover:text-flag-600 dark:text-flag-400 dark:hover:text-flag-300 underline-offset-2 hover:underline">← Kembali ke Situs</a>
+        <a href="{{ url('/') }}" class="text-flag-700 hover:text-flag-600 dark:text-flag-300 dark:hover:text-flag-200 underline-offset-2 hover:underline">← Kembali ke Situs</a>
     </div>
 
     {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_PAGE_END, scopes: $this->getRenderHookScopes()) }}

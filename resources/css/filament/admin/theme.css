@@ -193,6 +193,10 @@ h1.fi-header-heading,
     color: rgb(133 133 133) !important;
 }
 
+.dark .fi-sidebar-group-label {
+    color: rgb(175 175 175) !important;
+}
+
 /* Semua item dapat bar kiri transparan 4px agar transisi ke aktif tidak
    menggeser tata letak. */
 .fi-sidebar-item .fi-sidebar-item-button {
@@ -838,6 +842,16 @@ body,
 .dark .fi-body,
 .dark .fi-main-ctn {
     background-color: rgb(13 13 13) !important;
+}
+
+/* Amankan teks isi utama bila utilitas dark: tidak ter-compile (regresi). */
+.dark .fi-main {
+    color: rgb(245 245 245);
+}
+
+/* Tabel: sel isi — teks terang di baris gelap (Filament pakai gray-950 default). */
+.dark .fi-ta-cell {
+    color: rgb(237 237 237);
 }
 
 /* -----------------------------------------------------------------------------

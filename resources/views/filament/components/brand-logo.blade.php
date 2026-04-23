@@ -13,10 +13,11 @@
         >
     </div>
     <div class="leading-none">
-        <div class="font-display text-xl tracking-[0.08em] uppercase text-ink-900 dark:text-paper-50">
+        {{-- Di dark mode token paper-* = permukaan gelap; teks selalu pakai ink-* (terang di .dark). --}}
+        <div class="font-display text-xl tracking-[0.08em] uppercase text-ink-900">
             SEPETAK
         </div>
-        <div class="font-mono text-[0.6rem] uppercase tracking-widest text-ink-700 dark:text-paper-200 mt-0.5">
+        <div class="font-mono text-[0.6rem] uppercase tracking-widest text-ink-700 mt-0.5">
             Panel Administrasi
         </div>
     </div>

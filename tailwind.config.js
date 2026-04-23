@@ -2,6 +2,10 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    // Wajib `class`: Filament menambah `.dark` di <html> lewat JS / forced mode.
+    // Default `media` membuat `dark:*` hanya mengikuti prefers-color-scheme,
+    // sehingga teks tetap gray-950 di latar gelap → kontras hancur.
+    darkMode: 'class',
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
