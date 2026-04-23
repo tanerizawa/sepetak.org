@@ -636,31 +636,45 @@ h1.fi-header-heading,
     width: 100%;
 }
 
-/* Kolom form: teks & field harus jelas di atas paper-50 (hindari abu-abu Filament tipis). */
+/*
+ * Kolom login — KONTRAS PAKSA (RGB + html.dark)
+ * Filament merender label/input dengan text-gray-950 dark:text-white; jika
+ * bundle/admin tidak pakai darkMode:class atau aset Vite tidak ter-deploy,
+ * dark:text-white tidak ada → teks hampir hitam di latar gelap.
+ * Variabel --ink-* juga bisa kalah urutan dari @layer utilities.
+ */
 .sepetak-login-form,
 .sepetak-login-form .fi-simple-page {
-    color: hsl(var(--ink-900));
+    color: rgb(13 13 13);
 }
 
-.dark .sepetak-login-form,
-.dark .sepetak-login-form .fi-simple-page {
-    color: hsl(var(--ink-900));
+/* Judul & pengantar (bukan komponen Filament) */
+.sepetak-login-form .fi-simple-page .mb-8 h2 {
+    color: rgb(13 13 13) !important;
 }
 
+.sepetak-login-form .fi-simple-page .mb-8 p {
+    color: rgb(38 38 38) !important;
+}
+
+.sepetak-login-form .fi-simple-page .mb-8 .text-flag-700 {
+    color: rgb(126 10 30) !important;
+}
+
+.sepetak-login-form .fi-simple-page .mb-8 h2 .text-flag-600 {
+    color: rgb(200 16 46) !important;
+}
+
+/* Label + teks bantu field (semua span di dalam label, termasuk "Ingat saya") */
 .sepetak-login-form .fi-fo-field-wrp-label,
 .sepetak-login-form .fi-fo-field-wrp-label span {
-    color: hsl(var(--ink-900)) !important;
+    color: rgb(13 13 13) !important;
     font-weight: 600;
 }
 
 .sepetak-login-form .fi-fo-field-wrp-hint,
 .sepetak-login-form .fi-fo-field-wrp-helper-text {
-    color: hsl(var(--ink-700)) !important;
-}
-
-.dark .sepetak-login-form .fi-fo-field-wrp-hint,
-.dark .sepetak-login-form .fi-fo-field-wrp-helper-text {
-    color: hsl(var(--ink-700)) !important;
+    color: rgb(55 55 55) !important;
 }
 
 .sepetak-login-form .fi-input-wrp {
@@ -671,56 +685,116 @@ h1.fi-header-heading,
 
 .sepetak-login-form input.fi-input {
     background-color: transparent !important;
-    color: hsl(var(--ink-900)) !important;
-    -webkit-text-fill-color: hsl(var(--ink-900)) !important;
+    color: rgb(13 13 13) !important;
+    -webkit-text-fill-color: rgb(13 13 13) !important;
 }
 
 .sepetak-login-form input.fi-input::placeholder {
-    color: hsl(var(--ink-700) / 0.72) !important;
-    -webkit-text-fill-color: hsl(var(--ink-700) / 0.72) !important;
+    color: rgb(82 82 82) !important;
+    -webkit-text-fill-color: rgb(82 82 82) !important;
 }
 
-.dark .sepetak-login-form .fi-input-wrp {
-    background-color: rgb(30 30 30) !important;
-    --tw-ring-color: hsl(var(--ink-200)) !important;
+.sepetak-login-form .fi-input-wrp-suffix {
+    border-color: rgb(200 200 200) !important;
 }
 
-.dark .sepetak-login-form input.fi-input {
-    color: hsl(var(--ink-900)) !important;
-    -webkit-text-fill-color: hsl(var(--ink-900)) !important;
+/* Ikon / tombol tampilkan sandi (bukan .fi-btn biasa) */
+.sepetak-login-form .fi-icon-btn {
+    color: rgb(82 82 82) !important;
 }
 
-.dark .sepetak-login-form input.fi-input::placeholder {
-    color: hsl(var(--ink-700) / 0.85) !important;
-    -webkit-text-fill-color: hsl(var(--ink-700) / 0.85) !important;
+.sepetak-login-form .fi-icon-btn:hover {
+    color: rgb(13 13 13) !important;
 }
 
-.sepetak-login-form .fi-fo-checkbox label,
-.sepetak-login-form .fi-fo-checkbox .fi-fo-field-wrp-label,
-.sepetak-login-form label[for*="remember"] {
-    color: hsl(var(--ink-900)) !important;
+/* Checkbox: label sudah di atas; pastikan span teks */
+.sepetak-login-form .fi-fo-checkbox .fi-fo-field-wrp-label span {
     font-weight: 500;
 }
 
-/* Aksi inline (tampilkan / sembunyikan sandi) */
-.sepetak-login-form .fi-input-wrp .fi-btn,
-.sepetak-login-form .fi-input-wrp button[type="button"] {
-    color: hsl(var(--flag-700)) !important;
+/* Tombol submit area — label "Masuk" */
+.sepetak-login-form .fi-btn-label {
+    color: rgb(252 249 241) !important;
 }
 
-.sepetak-login-form .fi-input-wrp .fi-btn:hover,
-.sepetak-login-form .fi-input-wrp button[type="button"]:hover {
-    color: hsl(var(--flag-600)) !important;
+/* --- Mode gelap: html memiliki kelas .dark (Filament) --- */
+html.dark .sepetak-login-form,
+html.dark .sepetak-login-form .fi-simple-page {
+    color: rgb(245 245 245);
 }
 
-.dark .sepetak-login-form .fi-input-wrp .fi-btn,
-.dark .sepetak-login-form .fi-input-wrp button[type="button"] {
-    color: hsl(var(--flag-300)) !important;
+html.dark .sepetak-login-form .fi-simple-page .mb-8 h2 {
+    color: rgb(252 249 241) !important;
 }
 
-.dark .sepetak-login-form .fi-input-wrp .fi-btn:hover,
-.dark .sepetak-login-form .fi-input-wrp button[type="button"]:hover {
-    color: hsl(var(--flag-200)) !important;
+html.dark .sepetak-login-form .fi-simple-page .mb-8 p {
+    color: rgb(212 212 212) !important;
+}
+
+html.dark .sepetak-login-form .fi-simple-page .mb-8 .text-flag-700 {
+    color: rgb(252 165 165) !important;
+}
+
+html.dark .sepetak-login-form .fi-simple-page .mb-8 .bg-flag-600 {
+    background-color: rgb(220 38 38) !important;
+}
+
+html.dark .sepetak-login-form .fi-simple-page .mb-8 h2 .text-flag-600 {
+    color: rgb(252 165 165) !important;
+}
+
+html.dark .sepetak-login-form .fi-fo-field-wrp-label,
+html.dark .sepetak-login-form .fi-fo-field-wrp-label span {
+    color: rgb(245 245 245) !important;
+}
+
+html.dark .sepetak-login-form .fi-fo-field-wrp-hint,
+html.dark .sepetak-login-form .fi-fo-field-wrp-helper-text {
+    color: rgb(180 180 180) !important;
+}
+
+html.dark .sepetak-login-form .fi-input-wrp {
+    background-color: rgb(38 38 38) !important;
+    --tw-ring-color: rgb(120 120 120) !important;
+}
+
+html.dark .sepetak-login-form input.fi-input {
+    color: rgb(245 245 245) !important;
+    -webkit-text-fill-color: rgb(245 245 245) !important;
+}
+
+html.dark .sepetak-login-form input.fi-input::placeholder {
+    color: rgb(163 163 163) !important;
+    -webkit-text-fill-color: rgb(163 163 163) !important;
+}
+
+html.dark .sepetak-login-form .fi-input-wrp-suffix {
+    border-color: rgba(255 255 255 0.18) !important;
+}
+
+html.dark .sepetak-login-form .fi-icon-btn {
+    color: rgb(180 180 180) !important;
+}
+
+html.dark .sepetak-login-form .fi-icon-btn:hover {
+    color: rgb(245 245 245) !important;
+}
+
+/* Footer strip di bawah form */
+html.dark .sepetak-login-form .fi-simple-page > div.mt-10 {
+    border-top-color: rgba(255 255 255 0.22) !important;
+}
+
+html.dark .sepetak-login-form .fi-simple-page > div.mt-10 span {
+    color: rgb(212 212 212) !important;
+}
+
+html.dark .sepetak-login-form .fi-simple-page > div.mt-10 a {
+    color: rgb(252 165 165) !important;
+}
+
+html.dark .sepetak-login-form .fi-simple-page > div.mt-10 a:hover {
+    color: rgb(254 202 202) !important;
 }
 
 /* -----------------------------------------------------------------------------
